@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulateur acheter ou louer</title>
+  <style>
+    :root {
+      --bg: #f4f6f3;
+      --surface: #ffffff;
+      --surface-2: #eef3f5;
+      --text: #17211d;
+      --muted: #65716b;
+      --line: #d7dfdc;
+      --accent: #0f766e;
+      --accent-2: #8b5e34;
+      --danger: #a83f39;
+      --good: #24714d;
+      --shadow: 0 14px 34px rgba(23, 33, 29, 0.09);
+      --radius: 8px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+    }
+
+    aside {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      height: 100vh;
+      overflow: auto;
+      padding: 22px;
+      position: sticky;
+      top: 0;
+    }
+
+    main {
+      min-width: 0;
+      padding: 26px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 42px);
+      line-height: 1.08;
+      max-width: 780px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 22px 0 10px;
+      text-transform: uppercase;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      box-shadow: none;
+      border: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .span-4 {
+      grid-column: span 4;
+    }
+
+    .span-6 {
+      grid-column: span 6;
+    }
+
+    .span-8 {
+      grid-column: span 8;
+    }
+
+    .span-12 {
+      grid-column: span 12;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid #c8d2ce;
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      padding: 8px 10px;
+      outline: 0;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .check-row input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+      padding: 9px 12px;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      flex: 1;
+    }
+
+    .hero-result {
+      padding: 20px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .verdict {
+      border-left: 5px solid var(--accent);
+      padding-left: 16px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .verdict strong {
+      font-size: clamp(24px, 4vw, 40px);
+      line-height: 1.1;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 14px;
+      min-height: 104px;
+      display: grid;
+      align-content: space-between;
+      gap: 8px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metric b {
+      font-size: 22px;
+      line-height: 1.08;
+      overflow-wrap: anywhere;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .segmented {
+      display: inline-grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .segmented button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+      min-height: 38px;
+      padding: 8px 12px;
+    }
+
+    .segmented button.active {
+      background: var(--text);
+      color: #fff;
+    }
+
+    .chart-wrap {
+      padding: 16px;
+      height: 360px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .breakdown {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .breakdown .panel {
+      padding: 16px;
+      box-shadow: none;
+    }
+
+    .kv {
+      display: grid;
+      gap: 10px;
+    }
+
+    .kv div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .kv div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .kv span {
+      color: var(--muted);
+    }
+
+    .kv b {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .table-panel {
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .table-scroll {
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 840px;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: var(--surface);
+    }
+
+    thead th {
+      background: #e7eeeb;
+      color: var(--muted);
+      font-size: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .note {
+      background: #fff8e8;
+      border: 1px solid #ead8ad;
+      border-radius: var(--radius);
+      color: #654714;
+      font-size: 12px;
+      margin-top: 16px;
+      padding: 12px;
+    }
+
+    .warning {
+      color: var(--danger);
+      font-weight: 800;
+      margin-top: 10px;
+    }
+
+    .positive {
+      color: var(--good);
+    }
+
+    .negative {
+      color: var(--danger);
+    }
+
+    @media (max-width: 1040px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        height: auto;
+        position: static;
+      }
+
+      .span-4,
+      .span-6,
+      .span-8 {
+        grid-column: span 12;
+      }
+
+      .hero-result,
+      .breakdown {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      aside,
+      main {
+        padding: 16px;
+      }
+
+      header {
+        display: grid;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        display: grid;
+      }
+
+      .segmented {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <section class="controls">
+        <h2>Hypothèses</h2>
+        <p class="subtle">Tous les montants sont en euros. Les taux sont annuels.</p>
+
+        <h3>Cadre</h3>
+        <div class="grid">
+          <label class="span-6">Horizon
+            <input id="horizonYears" type="number" min="1" max="50" step="1" value="25">
+          </label>
+          <label class="span-6">Mode d'affichage
+            <select id="displayMode">
+              <option value="real">Euros constants</option>
+              <option value="nominal">Euros nominaux</option>
+            </select>
+          </label>
+        </div>
+
+        <h3>Achat</h3>
+        <div class="grid">
+          <label class="span-6">Prix du bien
+            <input id="purchasePrice" type="number" min="0" step="1000" value="350000">
+          </label>
+          <label class="span-6">Apport utilisé
+            <input id="downPayment" type="number" min="0" step="1000" value="35000">
+          </label>
+          <label class="span-6">Région
+            <select id="region">
+              <option value="brussels">Bruxelles</option>
+              <option value="wallonia">Wallonie</option>
+              <option value="flanders">Flandre</option>
+              <option value="custom">Personnalisé</option>
+            </select>
+          </label>
+          <label class="span-6">Type de bien
+            <select id="propertyType">
+              <option value="existing">Existant</option>
+              <option value="new">Neuf / TVA</option>
+            </select>
+          </label>
+          <label class="span-6">Durée crédit
+            <input id="loanYears" type="number" min="1" max="40" step="1" value="25">
+          </label>
+          <label class="span-6">Taux crédit
+            <input id="mortgageRate" type="number" min="0" max="20" step="0.05" value="3.50">
+          </label>
+          <label class="span-6">Croissance immobilier
+            <input id="propertyGrowth" type="number" min="-20" max="20" step="0.1" value="2.00">
+          </label>
+        </div>
+
+        <div class="check-row">
+          <span>Habitation propre et unique</span>
+          <input id="ownUnique" type="checkbox" checked>
+        </div>
+
+        <h3>Frais d'achat</h3>
+        <div class="grid">
+          <label class="span-6">Droits enregistrement
+            <input id="registrationRate" type="number" min="0" max="25" step="0.1" value="12.50">
+          </label>
+          <label class="span-6">Abattement
+            <input id="abatement" type="number" min="0" step="1000" value="200000">
+          </label>
+          <label class="span-6">Prix max abattement
+            <input id="abatementCap" type="number" min="0" step="1000" value="600000">
+          </label>
+          <label class="span-6">TVA neuf
+            <input id="vatRate" type="number" min="0" max="25" step="0.1" value="21.00">
+          </label>
+          <label class="span-6">Frais notaire vente
+            <input id="notaryPurchaseRate" type="number" min="0" max="10" step="0.1" value="1.50">
+          </label>
+          <label class="span-6">Frais crédit
+            <input id="creditCostRate" type="number" min="0" max="10" step="0.1" value="1.20">
+          </label>
+          <label class="span-6">Frais bancaires fixes
+            <input id="bankFixedFees" type="number" min="0" step="100" value="1500">
+          </label>
+        </div>
+
+        <h3>Coûts propriétaire</h3>
+        <div class="grid">
+          <label class="span-6">Précompte annuel
+            <input id="propertyTax" type="number" min="0" step="100" value="1400">
+          </label>
+          <label class="span-6">Assurances annuelles
+            <input id="ownerInsurance" type="number" min="0" step="100" value="900">
+          </label>
+          <label class="span-6">Entretien du bien
+            <input id="maintenanceRate" type="number" min="0" max="10" step="0.1" value="1.00">
+          </label>
+          <label class="span-6">Autres frais annuels
+            <input id="otherOwnerCosts" type="number" min="0" step="100" value="1200">
+          </label>
+        </div>
+
+        <h3>Location</h3>
+        <div class="grid">
+          <label class="span-6">Loyer mensuel
+            <input id="monthlyRent" type="number" min="0" step="50" value="1050">
+          </label>
+          <label class="span-6">Indexation loyer
+            <input id="rentInflation" type="number" min="-10" max="20" step="0.1" value="2.00">
+          </label>
+          <label class="span-6">Charges locatives
+            <input id="renterCharges" type="number" min="0" step="25" value="100">
+          </label>
+          <label class="span-6">Assurance locataire
+            <input id="renterInsurance" type="number" min="0" step="10" value="20">
+          </label>
+          <label class="span-6">Garantie locative
+            <input id="rentalGuaranteeMonths" type="number" min="0" max="6" step="0.5" value="2">
+          </label>
+        </div>
+
+        <h3>Investissement et inflation</h3>
+        <div class="grid">
+          <label class="span-6">Rendement investissement
+            <input id="investmentReturn" type="number" min="-30" max="30" step="0.1" value="7.00">
+          </label>
+          <label class="span-6">Frais sur chaque achat
+            <input id="investmentDrag" type="number" min="0" max="10" step="0.01" value="0.12">
+          </label>
+          <label class="span-6">Inflation générale
+            <input id="generalInflation" type="number" min="-10" max="20" step="0.1" value="2.00">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="calculateBtn" type="button">Calculer</button>
+          <button class="btn" id="resetBtn" type="button">Reset</button>
+        </div>
+
+        <div id="inputWarning" class="warning"></div>
+        <div class="note">
+          Les presets fiscaux sont indicatifs et modifiables. Vérifie les règles régionales exactes, l'éligibilité aux abattements et le traitement TVA avant une décision réelle.
+        </div>
+      </section>
+    </aside>
+
+    <main>
+      <header>
+        <div>
+          <h1>Acheter ou louer en Belgique</h1>
+          <p class="subtle">Projection patrimoniale avec crédit, inflation, croissance immobilière et investissement alternatif.</p>
+        </div>
+      </header>
+
+      <section class="panel hero-result">
+        <div class="verdict" id="verdictBox">
+          <p class="subtle">Résultat</p>
+          <strong id="verdictTitle">Calcul en cours</strong>
+          <p id="verdictText">Ajuste les hypothèses pour comparer les deux scénarios.</p>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <span>Patrimoine achat</span>
+            <b id="buyerNetWorth">-</b>
+          </div>
+          <div class="metric">
+            <span>Patrimoine location</span>
+            <b id="renterNetWorth">-</b>
+          </div>
+          <div class="metric">
+            <span>Ecart final</span>
+            <b id="finalGap">-</b>
+          </div>
+          <div class="metric">
+            <span>Point d'équilibre</span>
+            <b id="breakEven">-</b>
+          </div>
+        </div>
+      </section>
+
+      <div class="toolbar">
+        <div>
+          <h2>Evolution du patrimoine net</h2>
+          <p class="subtle" id="chartSubtitle">Montants convertis selon le mode choisi.</p>
+        </div>
+        <div class="segmented" aria-label="Choix du graphique">
+          <button id="chartNet" type="button" class="active">Patrimoine</button>
+          <button id="chartCash" type="button">Cash-flow</button>
+        </div>
+      </div>
+
+      <section class="panel chart-wrap">
+        <canvas id="resultChart" width="1200" height="520"></canvas>
+      </section>
+
+      <section class="breakdown">
+        <div class="panel">
+          <h2>Achat</h2>
+          <div class="kv" id="buyBreakdown"></div>
+        </div>
+        <div class="panel">
+          <h2>Location</h2>
+          <div class="kv" id="rentBreakdown"></div>
+        </div>
+        <div class="panel">
+          <h2>Financement</h2>
+          <div class="kv" id="financeBreakdown"></div>
+        </div>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Année</th>
+                <th>Patrimoine achat</th>
+                <th>Patrimoine location</th>
+                <th>Investi achat</th>
+                <th>Intérêts achat</th>
+                <th>Investi location</th>
+                <th>Intérêts location</th>
+                <th>Ecart patrimoine</th>
+                <th>Valeur bien</th>
+                <th>Dette restante</th>
+                <th>Coût achat/mois</th>
+                <th>Coût location/mois</th>
+                <th>Différence/mois</th>
+              </tr>
+            </thead>
+            <tbody id="yearRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const defaults = {
+      horizonYears: 25,
+      displayMode: "real",
+      purchasePrice: 350000,
+      downPayment: 35000,
+      region: "brussels",
+      propertyType: "existing",
+      loanYears: 25,
+      mortgageRate: 3.5,
+      propertyGrowth: 2,
+      ownUnique: true,
+      registrationRate: 12.5,
+      abatement: 200000,
+      abatementCap: 600000,
+      vatRate: 21,
+      notaryPurchaseRate: 1.5,
+      creditCostRate: 1.2,
+      bankFixedFees: 1500,
+      propertyTax: 1400,
+      ownerInsurance: 900,
+      maintenanceRate: 1,
+      otherOwnerCosts: 1200,
+      monthlyRent: 1050,
+      rentInflation: 2,
+      renterCharges: 100,
+      renterInsurance: 20,
+      rentalGuaranteeMonths: 2,
+      investmentReturn: 7,
+      investmentDrag: 0.12,
+      generalInflation: 2
+    };
+
+    const regionPresets = {
+      brussels: { registrationRate: 12.5, abatement: 200000, abatementCap: 600000 },
+      wallonia: { registrationRate: 3, abatement: 0, abatementCap: 0 },
+      flanders: { registrationRate: 2, abatement: 0, abatementCap: 0 },
+      custom: null
+    };
+
+    const ids = Object.keys(defaults);
+    const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+    const eur = new Intl.NumberFormat("fr-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+    const pct = new Intl.NumberFormat("fr-BE", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    let latestResult = null;
+    let chartMode = "net";
+
+    function n(id) {
+      return Number(el[id].value) || 0;
+    }
+
+    function r(id) {
+      return n(id) / 100;
+    }
+
+    function value(id) {
+      const node = el[id];
+      if (node.type === "checkbox") return node.checked;
+      if (node.tagName === "SELECT") return node.value;
+      return n(id);
+    }
+
+    function setValue(id, val) {
+      const node = el[id];
+      if (node.type === "checkbox") node.checked = Boolean(val);
+      else node.value = val;
+    }
+
+    function collectInputs() {
+      return Object.fromEntries(ids.map((id) => [id, value(id)]));
+    }
+
+    function money(amount, mode, year, inflation) {
+      const divisor = mode === "real" ? Math.pow(1 + inflation, year) : 1;
+      return amount / divisor;
+    }
+
+    function monthlyPayment(principal, annualRate, months) {
+      if (principal <= 0 || months <= 0) return 0;
+      const rate = annualRate / 12;
+      if (rate === 0) return principal / months;
+      return principal * rate / (1 - Math.pow(1 + rate, -months));
+    }
+
+    function acquisitionCosts(input) {
+      const price = input.purchasePrice;
+      const loan = Math.max(0, price - input.downPayment);
+      const isNew = input.propertyType === "new";
+      const eligibleAbatement = input.ownUnique && input.abatementCap > 0 && price <= input.abatementCap;
+      const taxableBase = eligibleAbatement ? Math.max(0, price - input.abatement) : price;
+      const tax = isNew ? price * rFrom(input.vatRate) : taxableBase * rFrom(input.registrationRate);
+      const notary = price * rFrom(input.notaryPurchaseRate);
+      const credit = loan * rFrom(input.creditCostRate);
+      const total = tax + notary + credit + input.bankFixedFees;
+      return { loan, tax, notary, credit, total, taxableBase };
+    }
+
+    function rFrom(value) {
+      return (Number(value) || 0) / 100;
+    }
+
+    function simulate() {
+      const input = collectInputs();
+      const acq = acquisitionCosts(input);
+      const horizonMonths = Math.round(input.horizonYears * 12);
+      const loanMonths = Math.round(input.loanYears * 12);
+      const mortgageAnnual = rFrom(input.mortgageRate);
+      const mortgageMonthly = monthlyPayment(acq.loan, mortgageAnnual, loanMonths);
+      const investmentAnnual = Math.max(-0.95, rFrom(input.investmentReturn));
+      const investmentMonthly = Math.pow(1 + investmentAnnual, 1 / 12) - 1;
+      const investmentPurchaseFeeRate = Math.min(0.95, Math.max(0, rFrom(input.investmentDrag)));
+      const inflation = rFrom(input.generalInflation);
+      const rentInflation = rFrom(input.rentInflation);
+      const propertyGrowth = rFrom(input.propertyGrowth);
+      const initialCashUsedBuy = input.downPayment + acq.total;
+      const rentalGuarantee = input.monthlyRent * input.rentalGuaranteeMonths;
+      const initialRenterContribution = Math.max(0, input.downPayment - rentalGuarantee);
+      const initialInvestmentFee = initialRenterContribution * investmentPurchaseFeeRate;
+      const initialRenterInvestment = initialRenterContribution - initialInvestmentFee;
+
+      let balance = acq.loan;
+      let buyerPortfolio = 0;
+      let renterPortfolio = initialRenterInvestment;
+      let totalInterest = 0;
+      let totalRent = 0;
+      let totalOwnerCosts = 0;
+      let totalOwnerSpend = 0;
+      let totalBuyerInvestmentFees = 0;
+      let totalBuyerInvestmentPurchases = 0;
+      let totalBuyerNetContributions = 0;
+      let totalRenterInvestmentFees = initialInvestmentFee;
+      let totalRenterInvestmentPurchases = initialRenterContribution;
+      let totalRenterNetContributions = initialRenterInvestment;
+      const rows = [];
+
+      function pushYear(month, monthlyOwnerCost = 0, monthlyRentCost = 0, monthlyDifference = 0) {
+        const year = month / 12;
+        const propertyValue = input.purchasePrice * Math.pow(1 + propertyGrowth, year);
+        const propertyEquity = propertyValue - balance;
+        const buyerNet = propertyEquity + buyerPortfolio;
+        const renterNet = renterPortfolio;
+        const buyerInterest = buyerPortfolio - totalBuyerNetContributions;
+        const renterInterest = renterPortfolio - totalRenterNetContributions;
+        const displayedBuyer = money(buyerNet, input.displayMode, year, inflation);
+        const displayedRenter = money(renterNet, input.displayMode, year, inflation);
+        rows.push({
+          year,
+          buyerNet,
+          renterNet,
+          displayedBuyer,
+          displayedRenter,
+          propertyValue,
+          propertyEquity,
+          balance,
+          buyerPortfolio,
+          renterPortfolio,
+          buyerContributions: totalBuyerNetContributions,
+          renterContributions: totalRenterNetContributions,
+          buyerInterest,
+          renterInterest,
+          monthlyOwnerCost,
+          monthlyRentCost,
+          monthlyDifference,
+          displayedPropertyValue: money(propertyValue, input.displayMode, year, inflation),
+          displayedBalance: money(balance, input.displayMode, year, inflation),
+          displayedBuyerPortfolio: money(buyerPortfolio, input.displayMode, year, inflation),
+          displayedBuyerContributions: money(totalBuyerNetContributions, input.displayMode, year, inflation),
+          displayedRenterContributions: money(totalRenterNetContributions, input.displayMode, year, inflation),
+          displayedBuyerInterest: money(buyerInterest, input.displayMode, year, inflation),
+          displayedRenterInterest: money(renterInterest, input.displayMode, year, inflation),
+          displayedMonthlyOwnerCost: money(monthlyOwnerCost, input.displayMode, year, inflation),
+          displayedMonthlyRentCost: money(monthlyRentCost, input.displayMode, year, inflation),
+          displayedMonthlyDifference: money(monthlyDifference, input.displayMode, year, inflation)
+        });
+      }
+
+      pushYear(0);
+
+      for (let month = 1; month <= horizonMonths; month++) {
+        const yearIndex = Math.floor((month - 1) / 12);
+        const annualFactor = Math.pow(1 + inflation, yearIndex);
+        const rentFactor = Math.pow(1 + rentInflation, yearIndex);
+        const mortgageDue = month <= loanMonths ? mortgageMonthly : 0;
+        let interest = 0;
+
+        if (month <= loanMonths && balance > 0) {
+          interest = balance * (mortgageAnnual / 12);
+          const principal = Math.min(balance, mortgageDue - interest);
+          balance = Math.max(0, balance - principal);
+          totalInterest += interest;
+        }
+
+        const annualOwnerCosts = (
+          input.propertyTax +
+          input.ownerInsurance +
+          input.otherOwnerCosts +
+          input.purchasePrice * rFrom(input.maintenanceRate)
+        ) * annualFactor;
+        const acquisitionMonthlyCost = month <= 12 ? acq.total / 12 : 0;
+        const monthlyOwnerCost = mortgageDue + annualOwnerCosts / 12 + acquisitionMonthlyCost;
+        const monthlyRentCost = (
+          input.monthlyRent * rentFactor +
+          input.renterCharges * annualFactor +
+          input.renterInsurance * annualFactor
+        );
+        const monthlyDifference = monthlyOwnerCost - monthlyRentCost;
+
+        totalOwnerCosts += annualOwnerCosts / 12;
+        totalOwnerSpend += monthlyOwnerCost;
+        totalRent += monthlyRentCost;
+
+        buyerPortfolio *= 1 + investmentMonthly;
+        renterPortfolio *= 1 + investmentMonthly;
+        if (monthlyDifference > 0) {
+          const investmentFee = monthlyDifference * investmentPurchaseFeeRate;
+          const renterContribution = monthlyDifference - investmentFee;
+          renterPortfolio += renterContribution;
+          totalRenterInvestmentFees += investmentFee;
+          totalRenterInvestmentPurchases += monthlyDifference;
+          totalRenterNetContributions += renterContribution;
+        } else if (monthlyDifference < 0) {
+          const buyerPurchase = -monthlyDifference;
+          const investmentFee = buyerPurchase * investmentPurchaseFeeRate;
+          const buyerContribution = buyerPurchase - investmentFee;
+          buyerPortfolio += buyerContribution;
+          totalBuyerInvestmentFees += investmentFee;
+          totalBuyerInvestmentPurchases += buyerPurchase;
+          totalBuyerNetContributions += buyerContribution;
+        }
+
+        if (month % 12 === 0) {
+          pushYear(month, monthlyOwnerCost, monthlyRentCost, monthlyDifference);
+        }
+      }
+
+      const final = rows[rows.length - 1];
+      const gap = final.displayedBuyer - final.displayedRenter;
+      const breakEvenRow = rows.find((row) => row.displayedBuyer >= row.displayedRenter && row.year > 0);
+      const warning = [];
+      if (input.downPayment > input.purchasePrice) {
+        warning.push("L'apport utilisé dépasse le prix du bien.");
+      }
+      if (rentalGuarantee > input.downPayment) {
+        warning.push("La garantie locative dépasse l'apport disponible pour l'investissement initial.");
+      }
+
+      latestResult = {
+        input,
+        acq,
+        rows,
+        mortgageMonthly,
+        final,
+        gap,
+        breakEvenYear: breakEvenRow ? breakEvenRow.year : null,
+        initialCashUsedBuy,
+        rentalGuarantee,
+        totalInterest,
+        totalRent,
+        totalOwnerCosts,
+        totalOwnerSpend,
+        totalBuyerInvestmentFees,
+        totalBuyerInvestmentPurchases,
+        totalBuyerNetContributions,
+        totalRenterInvestmentFees,
+        totalRenterInvestmentPurchases,
+        initialRenterInvestment,
+        totalRenterNetContributions,
+        warning
+      };
+
+      render(latestResult);
+    }
+
+    function render(result) {
+      const { input, acq, final, gap } = result;
+      const winner = gap >= 0 ? "acheter" : "louer";
+      const absGap = Math.abs(gap);
+      const displayYear = input.horizonYears;
+      const modeText = input.displayMode === "real" ? "en euros constants" : "en euros nominaux";
+
+      document.getElementById("verdictTitle").textContent = `${winner.charAt(0).toUpperCase() + winner.slice(1)} ressort gagnant`;
+      document.getElementById("verdictText").textContent = `Sur ${displayYear} ans, l'écart estimé est de ${eur.format(absGap)} ${modeText}.`;
+      document.getElementById("buyerNetWorth").textContent = eur.format(final.displayedBuyer);
+      document.getElementById("renterNetWorth").textContent = eur.format(final.displayedRenter);
+      document.getElementById("finalGap").textContent = `${gap >= 0 ? "+" : "-"}${eur.format(absGap)}`;
+      document.getElementById("finalGap").className = gap >= 0 ? "positive" : "negative";
+      document.getElementById("breakEven").textContent = result.breakEvenYear ? `Année ${result.breakEvenYear}` : "Aucun";
+      document.getElementById("inputWarning").textContent = result.warning.join(" ");
+      document.getElementById("chartSubtitle").textContent = `Affichage ${modeText}, inflation générale ${pct.format(rFrom(input.generalInflation))}.`;
+
+      kv("buyBreakdown", [
+        ["Valeur future du bien", final.propertyValue],
+        ["Dette restante", final.balance],
+        ["Patrimoine immobilier net", final.propertyEquity],
+        ["Portefeuille investi", final.buyerPortfolio],
+        ["Versements investis bruts", result.totalBuyerInvestmentPurchases],
+        ["Versements investis nets", result.totalBuyerNetContributions],
+        ["Intérêts nets cumulés", final.buyerInterest],
+        ["Frais sur achats cumulés", result.totalBuyerInvestmentFees],
+        ["Patrimoine achat total", final.buyerNet],
+        ["Dépenses achat cumulées", result.totalOwnerSpend],
+        ["Frais propriétaire cumulés", result.totalOwnerCosts]
+      ]);
+
+      kv("rentBreakdown", [
+        ["Patrimoine investi", final.renterPortfolio],
+        ["Investissement initial net", result.initialRenterInvestment],
+        ["Garantie déduite au départ", result.rentalGuarantee],
+        ["Loyers et charges cumulés", result.totalRent],
+        ["Achats d'investissement bruts", result.totalRenterInvestmentPurchases],
+        ["Montant investi cumulé", result.totalRenterNetContributions],
+        ["Intérêts nets cumulés", final.renterInterest],
+        ["Frais sur achats cumulés", result.totalRenterInvestmentFees],
+        ["Loyer final mensuel", input.monthlyRent * Math.pow(1 + rFrom(input.rentInflation), Math.max(0, input.horizonYears - 1))]
+      ]);
+
+      kv("financeBreakdown", [
+        ["Mensualité crédit", result.mortgageMonthly],
+        ["Montant emprunté", acq.loan],
+        ["Intérêts cumulés", result.totalInterest],
+        [input.propertyType === "new" ? "TVA sur le bien neuf" : "Droits d'enregistrement", acq.tax],
+        ["Frais de notaire", acq.notary],
+        ["Frais de crédit", acq.credit],
+        ["Frais bancaires", input.bankFixedFees],
+        ["Total frais d'achat", acq.total],
+        ["Cash requis achat", result.initialCashUsedBuy]
+      ]);
+
+      renderTable(result);
+      drawChart(result);
+    }
+
+    function kv(id, rows) {
+      document.getElementById(id).innerHTML = rows.map(([label, amount]) => (
+        `<div><span>${label}</span><b>${eur.format(amount)}</b></div>`
+      )).join("");
+    }
+
+    function renderTable(result) {
+      const body = document.getElementById("yearRows");
+      body.innerHTML = result.rows.map((row) => {
+        const gap = row.displayedBuyer - row.displayedRenter;
+        const difference = row.displayedMonthlyDifference;
+        return `
+          <tr>
+            <td>${row.year === 0 ? "Départ" : `Année ${row.year}`}</td>
+            <td>${eur.format(row.displayedBuyer)}</td>
+            <td>${eur.format(row.displayedRenter)}</td>
+            <td>${eur.format(row.displayedBuyerContributions)}</td>
+            <td class="${row.displayedBuyerInterest >= 0 ? "positive" : "negative"}">${row.displayedBuyerInterest >= 0 ? "+" : ""}${eur.format(row.displayedBuyerInterest)}</td>
+            <td>${eur.format(row.displayedRenterContributions)}</td>
+            <td class="${row.displayedRenterInterest >= 0 ? "positive" : "negative"}">${row.displayedRenterInterest >= 0 ? "+" : ""}${eur.format(row.displayedRenterInterest)}</td>
+            <td class="${gap >= 0 ? "positive" : "negative"}">${gap >= 0 ? "+" : ""}${eur.format(gap)}</td>
+            <td>${eur.format(row.displayedPropertyValue)}</td>
+            <td>${eur.format(row.displayedBalance)}</td>
+            <td>${row.year === 0 ? "-" : eur.format(row.displayedMonthlyOwnerCost)}</td>
+            <td>${row.year === 0 ? "-" : eur.format(row.displayedMonthlyRentCost)}</td>
+            <td class="${difference >= 0 ? "positive" : "negative"}">${row.year === 0 ? "-" : `${difference >= 0 ? "+" : ""}${eur.format(difference)}`}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function drawChart(result) {
+      const canvas = document.getElementById("resultChart");
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { top: 24, right: 24, bottom: 42, left: 72 };
+      const rows = result.rows;
+      const series = chartMode === "net"
+        ? [
+          { name: "Achat", color: "#0f766e", values: rows.map((row) => row.displayedBuyer) },
+          { name: "Location", color: "#8b5e34", values: rows.map((row) => row.displayedRenter) }
+        ]
+        : [
+          { name: "Coût achat", color: "#0f766e", values: rows.map((row) => row.displayedMonthlyOwnerCost || 0) },
+          { name: "Coût location", color: "#8b5e34", values: rows.map((row) => row.displayedMonthlyRentCost || 0) }
+        ];
+
+      const allValues = series.flatMap((s) => s.values);
+      const minValue = Math.min(0, ...allValues);
+      const maxValue = Math.max(1, ...allValues);
+      const range = maxValue - minValue || 1;
+      const xFor = (i) => pad.left + (i / Math.max(1, rows.length - 1)) * (w - pad.left - pad.right);
+      const yFor = (v) => pad.top + (1 - (v - minValue) / range) * (h - pad.top - pad.bottom);
+
+      ctx.strokeStyle = "#d7dfdc";
+      ctx.lineWidth = 1;
+      ctx.fillStyle = "#65716b";
+      ctx.font = "12px Inter, system-ui, sans-serif";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+
+      for (let i = 0; i <= 4; i++) {
+        const value = minValue + (range * i / 4);
+        const y = yFor(value);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
+        ctx.fillText(shortMoney(value), pad.left - 10, y);
+      }
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      const yearStep = Math.max(1, Math.ceil((rows.length - 1) / 5));
+      for (let i = 0; i < rows.length; i += yearStep) {
+        ctx.fillText(String(rows[i].year), xFor(i), h - pad.bottom + 14);
+      }
+      ctx.fillText(String(rows[rows.length - 1].year), xFor(rows.length - 1), h - pad.bottom + 14);
+
+      for (const serie of series) {
+        ctx.strokeStyle = serie.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        serie.values.forEach((value, i) => {
+          const x = xFor(i);
+          const y = yFor(value);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      let legendX = pad.left;
+      for (const serie of series) {
+        ctx.fillStyle = serie.color;
+        ctx.fillRect(legendX, 8, 12, 12);
+        ctx.fillStyle = "#17211d";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(serie.name, legendX + 18, 14);
+        legendX += 110;
+      }
+    }
+
+    function shortMoney(value) {
+      const abs = Math.abs(value);
+      if (abs >= 1000000) return `${Math.round(value / 100000) / 10} M€`;
+      if (abs >= 1000) return `${Math.round(value / 1000)} k€`;
+      return `${Math.round(value)} €`;
+    }
+
+    function applyRegionPreset() {
+      const preset = regionPresets[el.region.value];
+      if (!preset) return;
+      setValue("registrationRate", preset.registrationRate);
+      setValue("abatement", preset.abatement);
+      setValue("abatementCap", preset.abatementCap);
+      simulate();
+    }
+
+    function reset() {
+      for (const [id, val] of Object.entries(defaults)) setValue(id, val);
+      simulate();
+    }
+
+    ids.forEach((id) => {
+      const node = el[id];
+      node.addEventListener("input", simulate);
+      node.addEventListener("change", simulate);
+    });
+
+    el.region.addEventListener("change", applyRegionPreset);
+    document.getElementById("calculateBtn").addEventListener("click", simulate);
+    document.getElementById("resetBtn").addEventListener("click", reset);
+    document.getElementById("chartNet").addEventListener("click", () => {
+      chartMode = "net";
+      document.getElementById("chartNet").classList.add("active");
+      document.getElementById("chartCash").classList.remove("active");
+      drawChart(latestResult);
+    });
+    document.getElementById("chartCash").addEventListener("click", () => {
+      chartMode = "cash";
+      document.getElementById("chartCash").classList.add("active");
+      document.getElementById("chartNet").classList.remove("active");
+      drawChart(latestResult);
+    });
+    window.addEventListener("resize", () => latestResult && drawChart(latestResult));
+
+    simulate();
+  </script>
+</body>
+</html>
