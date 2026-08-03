@@ -3,14 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finances</title>
-  <link rel="canonical" href="https://romaincroix.github.io/finances/investment-tracker/">
-  <meta http-equiv="refresh" content="0; url=./investment-tracker/">
-  <script>
-    window.location.replace("./investment-tracker/");
-  </script>
+  <meta name="description" content="Outils et simulateurs financiers de Romain Croix.">
+  <title>Finances | Romain Croix</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f4f7fb;
+      --surface: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --border: #dfe5ef;
+      --disabled: #eef1f5;
+      --shadow: 0 18px 45px rgba(29, 42, 68, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32rem),
+        var(--background);
+    }
+
+    main {
+      width: min(100%, 980px);
+    }
+
+    header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.25rem, 6vw, 3.75rem);
+      letter-spacing: -0.04em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .tool {
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      padding: 26px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      color: var(--primary);
+      background: #eaf1ff;
+      font-size: 1.45rem;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+    }
+
+    .tool p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .button {
+      width: 100%;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: auto;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a.button {
+      color: #ffffff;
+      background: var(--primary);
+      transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    a.button:hover {
+      transform: translateY(-2px);
+      background: var(--primary-dark);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+    }
+
+    a.button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.28);
+      outline-offset: 3px;
+    }
+
+    button.button:disabled {
+      color: #8a94a5;
+      background: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 760px) {
+      .tools {
+        grid-template-columns: 1fr;
+      }
+
+      .tool {
+        min-height: 210px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirection vers <a href="./investment-tracker/">Investment Tracker</a>…</p>
+  <main>
+    <header>
+      <h1>Finances</h1>
+      <p>Choisissez l’outil que vous souhaitez utiliser.</p>
+    </header>
+
+    <section class="tools" aria-label="Outils financiers">
+      <article class="tool">
+        <div class="icon" aria-hidden="true">↗</div>
+        <h2>Investment Tracker</h2>
+        <p>Suivez et analysez l’évolution de vos investissements.</p>
+        <a class="button" href="./investment-tracker/">
+          Ouvrir l’outil <span aria-hidden="true">→</span>
+        </a>
+      </article>
+
+      <article class="tool">
+        <div class="icon" aria-hidden="true">⌂</div>
+        <h2>Achat maison différé</h2>
+        <p>Évaluez l’impact financier d’un achat immobilier reporté.</p>
+        <button class="button" type="button" disabled>Bientôt disponible</button>
+      </article>
+
+      <article class="tool">
+        <div class="icon" aria-hidden="true">⇄</div>
+        <h2>Achat vs location</h2>
+        <p>Comparez les coûts d’un achat immobilier et d’une location.</p>
+        <button class="button" type="button" disabled>Bientôt disponible</button>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
