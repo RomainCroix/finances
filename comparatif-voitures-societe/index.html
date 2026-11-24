@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparatif voitures de société — 4 SUV électriques</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --ink:#122033; --muted:#5b6b7f; --line:#dfe6ee;
+    --accent:#2563eb; --best:#0d9464; --bestbg:#e7f7f0; --warn:#b45309;
+    --skoda:#3d9a3d; --vw:#124191; --kia1:#bb162b; --kia2:#8f1020;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:linear-gradient(135deg,#0f1e35,#1c3a5e);color:#fff;padding:26px 20px 18px}
+  header h1{margin:0 0 6px;font-size:clamp(19px,3vw,26px)}
+  header p{margin:0;color:#c6d4e6;font-size:13.5px;max-width:1050px}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 14px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 4px;position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0}
+  .tabs button{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 13px;border-radius:999px;cursor:pointer;font-size:13.5px;font-weight:600}
+  .tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .opt{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:6px 0 12px;font-size:13.5px;color:var(--muted)}
+  .opt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+  .carhead{display:grid;grid-template-columns:minmax(150px,1.3fr) repeat(4,1fr);gap:8px;margin:8px 0}
+  .carhead div{border-radius:10px;color:#fff;padding:10px;font-size:13.5px;font-weight:700;line-height:1.35;min-height:66px;display:flex;flex-direction:column;justify-content:center}
+  .carhead small{display:block;font-weight:400;opacity:.88;font-size:11.5px;margin-top:3px}
+  .carhead .lead{background:transparent;color:var(--muted);font-weight:600;align-items:flex-start;justify-content:flex-end;padding-left:2px;font-size:12.5px}
+  .c1{background:var(--skoda)} .c2{background:var(--vw)} .c3{background:var(--kia1)} .c4{background:var(--kia2)}
+  .tblwrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;min-width:880px;font-size:14px}
+  th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  thead th{position:sticky;top:0;background:#eef2f7;font-size:13.5px;z-index:5}
+  thead th:first-child{left:0;z-index:10}
+  tbody th,.rlab{background:#f8fafc;font-weight:600;color:var(--ink);position:sticky;left:0;min-width:180px;font-size:13.5px;z-index:2}
+  tr:last-child td, tr:last-child th{border-bottom:none}
+  .best{background:var(--bestbg);font-weight:700}
+  .best::before{content:"★ ";color:var(--best)}
+  .muted{color:var(--muted);font-weight:400}
+  .fn{color:var(--warn);font-weight:700;cursor:help;border-bottom:1px dotted var(--warn)}
+  .footnote{font-size:13px;color:var(--muted);margin:6px 0}
+  .footnote b{color:var(--warn)}
+  .notebox{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 16px;font-size:13.5px;color:var(--muted);margin:14px 0}
+  .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px;margin-top:10px}
+  .sumcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13.5px}
+  .sumcard h3{margin:0 0 8px;font-size:14.5px;color:#fff;border-radius:8px;padding:7px 10px}
+  .sumcard h4{margin:10px 0 4px;font-size:13px;color:var(--best)}
+  .sumcard h4.minus{color:var(--warn)}
+  .sumcard ul{margin:0 0 0 18px;padding:0}
+  .sumcard li{margin:4px 0}
+  footer{font-size:12.5px;color:var(--muted);margin-top:22px;line-height:1.6}
+  .hidden{display:none}
+  @media (max-width:640px){ .carhead{grid-template-columns:1fr} .carhead .lead{display:none} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Comparatif voitures de société — 4 SUV 100&nbsp;% électriques</h1>
+  <p>Versions exactes des offres du concessionnaire (décembre 2024), croisées avec les fiches constructeurs (Škoda, Volkswagen, Kia Belux) — même batterie, même finition, mêmes options que la commande. Les autonomies et consommations WLTP de l'Elroq et de l'ID.4 proviennent du devis (configuration exacte)&nbsp;; celles des Kia proviennent des fiches constructeur pour la version exacte. <b>Aucune donnée tarifaire</b> — les quatre voitures sont accessibles dans le cadre de votre choix de voiture de société.</p>
+</header>
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+  <div class="carhead" id="carhead"></div>
+  <div class="opt"><label><input type="checkbox" id="diffonly"> Afficher uniquement les lignes qui diffèrent</label></div>
+  <div id="sections"></div>
+  <div class="notebox" id="legend">Légende&nbsp;: <span class="best">★ meilleur</span> de la ligne pour un critère chiffré&nbsp;·&nbsp; <span class="fn">n</span> note (survolez ou voir bas de page)&nbsp;·&nbsp; Les valeurs WLTP sont indicatives (laboratoire) et varient selon la température, le style de conduite et l'équipement.</div>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const CARS = [
+  { name:"Škoda Elroq 85", sub:"Corporate · modèle 2025", cls:"c1" },
+  { name:"VW ID.4 Pro", sub:"« Business » · modèle 2025", cls:"c2" },
+  { name:"Kia EV3", sub:"Business Plus 81,4 kWh · MY25", cls:"c3" },
+  { name:"Kia EV6", sub:"Business 84 kWh RWD · MY25 (restylé)", cls:"c4" }
+];
+
+function v(text, n, note, muted){ return {t:text, n:n, note:note, m:muted}; }
+
+const SECTIONS = [
+{ title:"Vue d'ensemble", rows:[
+  { l:"Version exacte (devis)", vals:[ "Elroq 85 « Corporate »","ID.4 Pro « Business »","EV3 « Business Plus »","EV6 « Business »" ] },
+  { l:"Millésime", vals:[ v("Modèle 2025"), v("Modèle 2025"), v("MY25"), v("MY25 (restylée)") ] },
+  { l:"Carrosserie", vals:[ "SUV compact","SUV compact","SUV compact","SUV crossover" ] },
+  { l:"Transmission", vals:[ "Propulsion (AR)","Propulsion (AR)","Traction (AV)","Propulsion (AR)" ] },
+  { l:"Moteur électrique", vals:[ "Synchrone à aimants permanents, 1 moteur AR","Synchrone à aimants permanents, 1 moteur AR","Synchrone à aimants permanents, 1 moteur AV","Synchrone à aimants permanents, 1 moteur AR" ] },
+  { l:"Peinture (devis)", vals:[ "Noir « Black Magic »","Noir métallisé « Grenadilla »","Gris « Shale »","Gris « Interstellar »" ] },
+  { l:"Jantes", vals:[ "19\" PROTEUS aérodynamiques","19\" HAMAR bicolores","17\" standard","19\"" ] }
+]},
+{ title:"Batterie & autonomie", rows:[
+  { l:"Batterie brute", unit:"kWh", vals:[ v("82",82), v("82",82), v("81,4",81.4), v("84,0",84) ], best:"max" },
+  { l:"Batterie nette (utile)", unit:"kWh", vals:[ v("77",77), v("77",77), v("≈ 76",76,"1"), v("80",80) ], best:"max" },
+  { l:"Autonomie WLTP combinée", unit:"km", vals:[ v("574",574,"2"), v("562",562,"2"), v("600",600,"2"), v("582",582,"2") ], best:"max" },
+  { l:"Autonomie WLTP urbaine", unit:"km", vals:[ v("722",722,"2"), v("715",715,"2"), "n.d.","n.d." ] },
+  { l:"Consommation mixte", unit:"kWh/100 km", vals:[ v("15,5",15.5,"2","(154,6 Wh/km)"), v("16,1",16.1,"2","(160,9 Wh/km)"), v("13,6",13.6), v("15,9",15.9,"2") ], best:"min" },
+  { l:"Pompe à chaleur", vals:[ v("Oui — R744 (CO₂), montée sur le devis"), v("Non — en option (non montée)"), v("Oui — de série"), v("Non — Pack EV Tech en option") ] }
+]},
+{ title:"Recharge", rows:[
+  { l:"Puissance de charge AC (où ?)", vals:[ "11 kW (Type 2)","11 kW (Type 2) + câble Mode 3 32 A","11 kW (Type 2)","11 kW (Type 2)" ] },
+  { l:"Charge AC 0 → 100 %", vals:[ v("≈ 8 h",8), v("≈ 7 h 30",7.5), v("7 h 15",7.25), v("10 → 100 % : 7 h 35",7.58) ], best:"min" },
+  { l:"Puissance de charge DC max", unit:"kW", vals:[ v("175",175), v("135",135,"3"), v("120",120), v("240",240,"4") ], best:"max" },
+  { l:"Charge DC 10 → 80 %", vals:[ v("≈ 28 min",28), v("≈ 28–30 min",29,"3"), v("≈ 30 min",30), v("≈ 18 min (borne 800 V ≥ 350 kW)",18,"4") ], best:"min" },
+  { l:"Recharge bidirectionnelle V2L (prise 230 V)", vals:[ "Non","Non", v("Oui — adaptateur extérieur 230 V inclus (Pack EV Tech)"), v("Non — possible via Pack EV Tech (option)") ] }
+]},
+{ title:"Performances", rows:[
+  { l:"Puissance", vals:[ v("286 ch (210 kW)",210), v("286 ch (210 kW)",210), v("204 ch (150 kW)",150), v("229 ch (169 kW)",169) ], best:"max" },
+  { l:"Couple", unit:"Nm", vals:[ v("545",545), v("545",545), v("283",283), v("350",350) ], best:"max" },
+  { l:"0 → 100 km/h", unit:"s", vals:[ v("6,6",6.6), v("6,7",6.7), v("7,7",7.7,"5"), v("7,7",7.7) ], best:"min" },
+  { l:"Vitesse maximale", unit:"km/h", vals:[ v("180",180), v("160",160), v("170",170), v("186",186) ], best:"max" }
+]},
+{ title:"Dimensions & habitabilité", rows:[
+  { l:"Longueur", unit:"mm", vals:[ v("4 488",4488), v("4 584",4584), v("4 300",4300), v("4 695",4695) ] },
+  { l:"Largeur (hors rétroviseurs)", unit:"mm", vals:[ v("1 884",1884), v("1 865",1865), v("1 830",1830), v("1 880",1880) ] },
+  { l:"Hauteur", unit:"mm", vals:[ v("≈ 1 620",1620), v("1 634",1634), v("1 560",1560), v("1 550",1550) ] },
+  { l:"Empattement", unit:"mm", vals:[ v("2 770",2770), v("2 771",2771), v("2 680",2680), v("2 900",2900) ] },
+  { l:"Coffre (VDA)", unit:"l", vals:[ v("470",470), v("543",543), v("460",460), v("490",490) ], best:"max" },
+  { l:"Coffre (banc rabattu)", unit:"l", vals:[ v("1 580",1580), v("1 575",1575), v("1 250",1250), v("1 290",1290) ], best:"max" },
+  { l:"Coffre avant (frunk)", unit:"l", vals:[ "—","—", v("≈ 25",25), v("52",52) ], best:"max" },
+  { l:"Poids à vide (avec conducteur)", unit:"kg", vals:[ v("2 125 – 2 265 selon équipement",2145,"6"), v("2 081",2081), v("1 834 min (17\")",1834), v("1 985 – 2 000",1993) ], best:"min" },
+  { l:"Attelage", vals:[ "Préparation (barre non montée)","Non monté","Préparation câblage (Trailer Package)","Trailer Package de série" ] },
+  { l:"Remorque freinée max.", unit:"kg", vals:[ v("1 000",1000), v("1 000 (sans barre montée)",1000), v("1 000",1000), v("≈ 1 600",1600,"8") ], best:"max" }
+]},
+{ title:"Confort & équipements", rows:[
+  { l:"Climatisation automatique", vals:[ "3 zones CLIMATRONIC (Pack Hiver)","2 zones","Bi-zone","Bi-zone" ] },
+  { l:"Sièges avant chauffants", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — 3 niveaux","ok"), v("Oui","ok") ] },
+  { l:"Sièges arrière chauffants", vals:[ v("Oui (Pack Hiver)","ok"), "Non (en option)", v("Oui (plages extérieures)","ok"), "Non" ] },
+  { l:"Volant chauffant", vals:[ v("Oui (Pack Hiver)","ok"), v("Oui","ok"), v("Oui","ok"), "n.d." ] },
+  { l:"Hayon", vals:[ v("Électrique + « Virtual Pedal » (mains libres)","ok"), v("Électrique — Easy Open & Close","ok"), v("Électrique — hauteur réglable","ok"), "Manuel" ] },
+  { l:"Sièges réglés électriquement", vals:[ "Non (réglage manuel)","Non — ArtVelours manuels", v("Oui — siège conducteur + lombaire Aircell","ok"), "Non (via finitions supérieures)" ] },
+  { l:"Écrans", vals:[ "Multimédia 13\" + combiné 5\"","Discover Pro 12,9\" + combiné 5,3\"","2 × 12,3\" courbes + clim 5,1\"","2 × 12,3\" courbes" ] },
+  { l:"Navigation intégrée", vals:[ v("Oui","ok"), v("Oui — Discover Pro","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Recharge smartphone sans fil", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Clé numérique (smartphone)", vals:[ "Non","Non", v("Oui — Digital Key 2.0","ok"), "Non (télécommande)" ] },
+  { l:"Démarrage sans clé", vals:[ v("Oui — KESSY Advanced","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Feux de route intelligents", vals:[ v("LED Matrix (anti-éblouissement adaptatif)","ok"), v("LED Matrix + Dynamic Light Assist","ok"), "LED « Design Cubes »", "LED (classiques)" ] },
+  { l:"Sellerie (devis)", vals:[ "LOFT — tissu","ArtVelours / microfibre","« Grey Two Tone » — vegan leather","Noir — tissu / vegan" ] }
+]},
+{ title:"Aides à la conduite", rows:[
+  { l:"Régulateur adaptatif (ACC) avec stop & go", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Aide au maintien dans la voie", vals:[ v("Lane Assist","ok"), v("Lane Assist","ok"), v("LFA 2.0","ok"), v("LFA 2.0","ok") ] },
+  { l:"Assistant semi-autonome (niveau 2+)", vals:[ "Travel Assist : en option, non au devis", v("Travel Assist","ok"), v("HDA II — Pack Advanced Drive (niveau 2+)","ok"), v("HDA 1.0","ok") ] },
+  { l:"Freinage d'urgence (AEB)", vals:[ v("Oui","ok"), v("Oui + détection piétons / cyclistes à l'avant","ok"), v("Oui — FCA 2.0 (Pack Advanced Drive)","ok"), v("Oui — FCA 1.5","ok") ] },
+  { l:"Reconnaissance des panneaux", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — NSCC","ok"), v("Oui","ok") ] },
+  { l:"Détection de fatigue", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Détection angle mort", vals:[ "Non (en option)", "Non (pas de Side Assist)", v("Oui — BCA + RVM","ok"), v("Oui — BCA","ok") ] },
+  { l:"Stationnement assisté", vals:[ "Non (en option)", v("Park Assist Plus","ok"), v("RSPA — à distance + télécommande (Pack Advanced Drive)","ok"), "Non (option)" ] },
+  { l:"Caméra 360°", vals:[ "Non (caméra AR)", "Non (caméra AR + Park Assist)", v("Oui — SVM 360° (Pack Advanced Drive)","ok"), "Non (caméra AR)" ] },
+  { l:"Capteurs de parking AV / AR", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — PDW AV/AR","ok"), v("Oui","ok") ] }
+]},
+{ title:"Sécurité & garanties", rows:[
+  { l:"Euro NCAP (année, étoiles)", vals:[ v("★★★★★ 2025 — adultes 90 % · enfants 87 % · usagers fragiles 77 % · assist. 78 %",2025), v("★★★★★ 2021 — 93 % · 89 % · 76 % · 85 %",2021), v("★★★★★ 2024 — 83 % · 84 % · 78 % · 78 %",2024), v("★★★★★ 2022 — 89 % · 85 % · 64 % · 74 %",2022) ] },
+  { l:"Ancres ISOFIX", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"eCall (appel d'urgence)", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Garantie véhicule", vals:[ v("2 ans, sans limite de km","monos"), v("2 ans, sans limite de km","monos"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] },
+  { l:"Garantie batterie (≥ 70 % capacité)", vals:[ v("8 ans ou 160 000 km","ok"), v("8 ans ou 160 000 km","ok"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] }
+]}
+];
+
+const SUMMARY = [
+ { cls:"c1", name:"Škoda Elroq 85 Corporate",
+   plus:["Pompe à chaleur R744 + Pack Hiver complet (clim 3 zones, sièges chauffants arrière, volant chauffant) — confort d'hiver optimal",
+         "Recharge DC très rapide : 175 kW, 10–80 % en ≈ 28 min",
+         "Hayon électrique avec Virtual Pedal (mains libres)",
+         "Coffre très modulable : 470 → 1 580 L",
+         "La plus grande autonomie urbaine (722 km selon devis)"],
+   minus:["Ni caméra 360°, ni Park Assist (caméra AR uniquement)",
+          "Aucun siège réglé électriquement",
+          "Attelage : préparation seulement (barre non montée)",
+          "Garantie constructeur plus courte (2 ans) que les Kia"] },
+ { cls:"c2", name:"VW ID.4 Pro Business",
+   plus:["Le plus grand coffre : 543 L",
+         "Park Assist Plus (stationnement semi-automatique)",
+         "LED Matrix + Dynamic Light Assist, Discover Pro 12,9\"",
+         "Poids contenu (2 081 kg) et encombrement maîtrisé"],
+   minus:["Pas de pompe à chaleur (option non montée), pas de sièges arrière chauffants",
+          "Recharge DC plafonnée à 135 kW (≈ 28–30 min de 10 à 80 %) — la plus lente du lot avec l'EV3",
+          "Vitesse max limitée à 160 km/h ; pas de détection d'angle mort ; pas d'attelage monté",
+          "Garantie constructeur plus courte (2 ans) que les Kia"] },
+ { cls:"c3", name:"Kia EV3 Business Plus",
+   plus:["Meilleure autonomie WLTP (600 km) et consommation la plus basse (13,6 kWh/100 km)",
+         "Nettement la plus légère (1 834 kg) — agilité et efficacité",
+         "Équipement d'aide au stationnement le plus riche : caméra 360°, stationnement à distance avec télécommande, angle mort (BCA/RVM)",
+         "Digital Key 2.0, hayon électrique à hauteur réglable",
+         "Garantie 7 ans / 150 000 km (véhicule ET batterie)"],
+   minus:["Puissance la plus faible (204 ch) et DC max 120 kW — la moins adaptée aux très longs trajets rapides",
+          "Jantes 17\" de série (moins flatteur, mais plus efficace)",
+          "Habitabilité arrière et coffre plus compacts"] },
+ { cls:"c4", name:"Kia EV6 Business (MY25 restylé)",
+   plus:["La plus rapide en charge : 240 kW DC, 10–80 % en ≈ 18 min",
+         "Plateforme 800 V ; le plus long (4,70 m) et grand empattement (2 900 mm)",
+         "0–100 km/h en 7,7 s, 186 km/h ; frunk de 52 L",
+         "Garantie 7 ans / 150 000 km (véhicule ET batterie)"],
+   minus:["Configurée sans packs : ni pompe à chaleur, ni V2L (ajoutables en option) ; hayon manuel",
+          "Pas de sièges arrière chauffants, pas de caméra 360°",
+          "Poids élevé (≈ 2 tonnes) pour un usage urbain fréquent",
+          "Feux LED simples (pas de matrice)"] }
+];
+
+const FOOTNOTES = {
+ "1":"Capacité utile de l'EV3 : ≈ 76 kWh (estimation presse ; Kia Belux ne publie que la capacité brute de 81,4 kWh).",
+ "2":"WLTP : pour l'Elroq 85 et l'ID.4, valeurs indiquées sur le devis (configuration exacte commandée — peinture, jantes…) : 574 km / 154,6 Wh/km combiné · 722 km urbain (Elroq) et 562 km / 160,9 Wh/km combiné · 715 km urbain (ID.4). Pour les Kia, valeurs constructeur (fiches Kia Belux) pour la version exacte : Business Plus 81,4 kWh 17\" (600 km / 13,6) et EV6 Business 84 kWh RWD restylée (582 km / 15,9).",
+ "3":"ID.4 Pro propulsion MY24/MY25 : 135 kW DC maximum (Volkswagen, essais presse, evkx). Les 175 kW concernent l'ID.4 4MOTION / l'année-modèle suivante. Temps 10–80 % : ≈ 28–30 min.",
+ "4":"EV6 : 240 kW selon Kia Belux — atteint sur bornes 800 V ≥ 350 kW ; Kia communique jusqu'à ≈ 260 kW de crête selon les bornes.",
+ "5":"EV3 : 7,7 s selon la fiche technique Kia Belux MY25 (7,5 s dans le texte kia.com/fr).",
+ "6":"Elroq : poids à vide 2 125 – 2 265 kg selon l'équipement, conducteur (75 kg) inclus — fiche technique officielle Škoda.",
+ "8":"EV6 RWD 84 kWh : ≈ 1 600 kg de remorque freinée (certaines versions vont jusqu'à 1 800 kg) — à confirmer avec la brochure du vendeur."
+};
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function cellHtml(val, best){
+  if(typeof val === "string") return "<td>"+esc(val)+"</td>";
+  let cls = "val";
+  if(best !== undefined && val.n !== undefined && Math.abs(val.n-best) < 1e-9) cls += " best";
+  const note = val.note ? ` <span class="fn" title="${esc(FOOTNOTES[val.note]||"")}">${val.note}</span>` : "";
+  const muted = val.m ? ` <span class="muted">${esc(val.m)}</span>` : "";
+  return `<td class="${cls}">${esc(val.t)}${note}${muted}</td>`;
+}
+
+function rowBest(row){
+  if(!row.best) return undefined;
+  const nums = row.vals.filter(x=>typeof x!=="string").map(x=>x.n).filter(n=>n!==undefined&&n!==null);
+  if(nums.length<2) return undefined;
+  return row.best==="max" ? Math.max(...nums) : Math.min(...nums);
+}
+
+function render(){
+  document.getElementById("carhead").innerHTML =
+    `<div class="lead" style="margin:0"></div>` + CARS.map(c=>
+      `<div class="${c.cls}">${esc(c.name)}<small>${esc(c.sub)}</small></div>`).join("");
+
+  const tabsEl = document.getElementById("tabs");
+  const secEl  = document.getElementById("sections");
+
+  SECTIONS.forEach((s,si)=>{
+    const wrap = document.createElement("section");
+    wrap.id = "sec-"+si;
+    const rows = s.rows.map(row=>{
+      const best = rowBest(row);
+      return "<tr><th class=\"rlab\">"+esc(row.l)+(row.unit?` <span class="muted">(${esc(row.unit)})</span>`:"")+"</th>"
+        + row.vals.map(val=>cellHtml(val,best)).join("") + "</tr>";
+    }).join("");
+    wrap.innerHTML = `<div class="tblwrap"><table><thead><tr><th>Critère</th>${CARS.map(c=>`<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    secEl.appendChild(wrap);
+  });
+
+  const sum = document.createElement("section");
+  sum.id = "sec-synth";
+  sum.innerHTML = '<div class="summary">' + SUMMARY.map(c=>`
+    <div class="sumcard">
+      <h3 class="${c.cls===''?'':c.cls}">${esc(c.name)}</h3>
+      <h4 class="plus">Points forts</h4><ul>${c.plus.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+      <h4 class="minus">À noter / limites</h4><ul>${c.minus.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+    </div>`).join("") + `</div>`;
+  secEl.appendChild(sum);
+
+  [...SECTIONS.map(s=>s.title),"Synthèse"].forEach((t,i)=>{
+    const b=document.createElement("button");
+    b.textContent=t; b.dataset.target = t==="Synthèse" ? "sec-synth" : "sec-"+i;
+    b.onclick=()=>{
+      tabsEl.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      document.querySelectorAll("#sections > section").forEach(s=>s.classList.toggle("hidden", s.id!==b.dataset.target));
+    };
+    tabsEl.appendChild(b);
+  });
+  tabsEl.querySelector("button").click();
+
+  document.getElementById("diffonly").addEventListener("change",function(){
+    document.querySelectorAll("#sections table tbody tr").forEach(tr=>{
+      const texts=[...tr.querySelectorAll("td")].map(td=>td.textContent.replace(/[\s★]/g,""));
+      tr.classList.toggle("hidden", this.checked && new Set(texts).size<=1);
+    });
+  });
+
+  document.getElementById("foot").innerHTML =
+    "<b>Notes</b>" +
+    Object.keys(FOOTNOTES).sort((a,b)=>+a-+b).map(k=>`<div class="footnote"><b>${k}.</b> ${esc(FOOTNOTES[k])}</div>`).join("") +
+    `<b>Sources</b>
+    <div class="footnote">Devis du vendeur (déc. 2024) : Škoda Elroq 85 Corporate (WLTP : 574 km / 154,6 Wh/km combiné · 722 km urbain), VW ID.4 Pro Business (WLTP : 562 km / 160,9 Wh/km combiné · 715 km urbain), Kia EV3 Business Plus 81,4 kWh MY25, Kia EV6 Business 84 kWh RWD MY25 — et sites constructeurs : Škoda (fiche technique officielle Elroq), Volkswagen (ID.4 Pro MY2025 : APP550 210 kW, AC 11 kW, DC 135 kW), Kia Belux (gammes et fiches EV3 MY25 / EV6 restylée 84 kWh : autonomies, recharge, équipements par finition), Euro NCAP (Elroq 2025, ID.4 2021, EV3 2024, EV6 2022).</div>
+    <div class="footnote">Comparatif fourni sans information tarifaire, conformément à la demande. Les valeurs WLTP sont indicatives ; les consommations et autonomies réelles varient selon la température, le style de conduite, la charge transportée et l'équipement (jantes, pneus).</div>`;
+}
+render();
+</script>
+</body>
+</html>
