@@ -49,6 +49,28 @@
   .sumcard li{margin:4px 0}
   footer{font-size:12.5px;color:var(--muted);margin-top:22px;line-height:1.6}
   .hidden{display:none}
+  .rankbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 14px}
+  .rankbox h2{margin:0 0 4px;font-size:17px}
+  .rankhint{margin:0 0 10px;color:var(--muted);font-size:13px}
+  .weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px;margin-bottom:10px}
+  .wrow{display:flex;flex-direction:column;gap:2px;font-size:13.5px}
+  .wtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .wval{font-weight:700;color:var(--accent);white-space:nowrap}
+  .wval.zero{color:var(--muted)}
+  .wrow input[type=range]{width:100%;cursor:pointer;accent-color:var(--accent)}
+  .rankactions{display:flex;gap:8px;margin:2px 0 14px;flex-wrap:wrap}
+  .rankactions button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .rankactions button:hover{border-color:var(--accent);color:var(--accent)}
+  .ranking{display:flex;flex-direction:column;gap:6px}
+  .rankrow{display:grid;grid-template-columns:34px minmax(140px,190px) 1fr 58px;align-items:center;gap:10px}
+  .rankmedal{font-size:16px;text-align:center}
+  .rankname{font-size:13.5px;font-weight:600}
+  .rankbar{background:#e9eef5;border-radius:999px;height:20px;overflow:hidden}
+  .rankfill{display:block;height:100%;border-radius:999px;min-width:3px}
+  .rankscore{font-weight:700;text-align:right;font-size:14px}
+  .rankign{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+  .detailtitle{font-size:14px;color:var(--muted);margin:4px 0 6px}
+  @media (max-width:640px){ .rankrow{grid-template-columns:26px 92px 1fr 50px} }
   @media (max-width:640px){ .carhead{grid-template-columns:1fr} .carhead .lead{display:none} }
 </style>
 </head>
@@ -90,16 +112,16 @@ const SECTIONS = [
   { l:"Batterie brute", unit:"kWh", vals:[ v("82",82), v("82",82), v("81,4",81.4), v("84,0",84) ], best:"max" },
   { l:"Batterie nette (utile)", unit:"kWh", vals:[ v("77",77), v("77",77), v("≈ 76",76,"1"), v("80",80) ], best:"max" },
   { l:"Autonomie WLTP combinée", unit:"km", vals:[ v("574",574,"2"), v("562",562,"2"), v("600",600,"2"), v("582",582,"2") ], best:"max" },
-  { l:"Autonomie WLTP urbaine", unit:"km", vals:[ v("722",722,"2"), v("715",715,"2"), "n.d.","n.d." ] },
+  { l:"Autonomie WLTP urbaine", unit:"km", vals:[ v("722",722,"2"), v("715",715,"2"), "n.d.","n.d." ], best:"max" },
   { l:"Consommation mixte", unit:"kWh/100 km", vals:[ v("15,5",15.5,"2","(154,6 Wh/km)"), v("16,1",16.1,"2","(160,9 Wh/km)"), v("13,6",13.6), v("15,9",15.9,"2") ], best:"min" },
-  { l:"Pompe à chaleur", vals:[ v("Oui — R744 (CO₂), montée sur le devis"), v("Non — en option (non montée)"), v("Oui — de série"), v("Non — Pack EV Tech en option") ] }
+  { l:"Pompe à chaleur", score:"bool", vals:[ v("Oui — R744 (CO₂), montée sur le devis"), v("Non — en option (non montée)"), v("Oui — de série"), v("Non — Pack EV Tech en option") ] }
 ]},
 { title:"Recharge", rows:[
   { l:"Puissance de charge AC (où ?)", vals:[ "11 kW (Type 2)","11 kW (Type 2) + câble Mode 3 32 A","11 kW (Type 2)","11 kW (Type 2)" ] },
   { l:"Charge AC 0 → 100 %", vals:[ v("≈ 8 h",8), v("≈ 7 h 30",7.5), v("7 h 15",7.25), v("10 → 100 % : 7 h 35",7.58) ], best:"min" },
   { l:"Puissance de charge DC max", unit:"kW", vals:[ v("175",175), v("135",135,"3"), v("120",120), v("240",240,"4") ], best:"max" },
   { l:"Charge DC 10 → 80 %", vals:[ v("≈ 28 min",28), v("≈ 28–30 min",29,"3"), v("≈ 30 min",30), v("≈ 18 min (borne 800 V ≥ 350 kW)",18,"4") ], best:"min" },
-  { l:"Recharge bidirectionnelle V2L (prise 230 V)", vals:[ "Non","Non", v("Oui — adaptateur extérieur 230 V inclus (Pack EV Tech)"), v("Non — possible via Pack EV Tech (option)") ] }
+  { l:"Recharge bidirectionnelle V2L (prise 230 V)", score:"bool", vals:[ "Non","Non", v("Oui — adaptateur extérieur 230 V inclus (Pack EV Tech)"), v("Non — possible via Pack EV Tech (option)") ] }
 ]},
 { title:"Performances", rows:[
   { l:"Puissance", vals:[ v("286 ch (210 kW)",210), v("286 ch (210 kW)",210), v("204 ch (150 kW)",150), v("229 ch (169 kW)",169) ], best:"max" },
@@ -121,37 +143,37 @@ const SECTIONS = [
 ]},
 { title:"Confort & équipements", rows:[
   { l:"Climatisation automatique", vals:[ "3 zones CLIMATRONIC (Pack Hiver)","2 zones","Bi-zone","Bi-zone" ] },
-  { l:"Sièges avant chauffants", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — 3 niveaux","ok"), v("Oui","ok") ] },
-  { l:"Sièges arrière chauffants", vals:[ v("Oui (Pack Hiver)","ok"), "Non (en option)", v("Oui (plages extérieures)","ok"), "Non" ] },
-  { l:"Volant chauffant", vals:[ v("Oui (Pack Hiver)","ok"), v("Oui","ok"), v("Oui","ok"), "n.d." ] },
-  { l:"Hayon", vals:[ v("Électrique + « Virtual Pedal » (mains libres)","ok"), v("Électrique — Easy Open & Close","ok"), v("Électrique — hauteur réglable","ok"), "Manuel" ] },
-  { l:"Sièges réglés électriquement", vals:[ "Non (réglage manuel)","Non — ArtVelours manuels", v("Oui — siège conducteur + lombaire Aircell","ok"), "Non (via finitions supérieures)" ] },
+  { l:"Sièges avant chauffants", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — 3 niveaux","ok"), v("Oui","ok") ] },
+  { l:"Sièges arrière chauffants", score:"bool", vals:[ v("Oui (Pack Hiver)","ok"), "Non (en option)", v("Oui (plages extérieures)","ok"), "Non" ] },
+  { l:"Volant chauffant", score:"bool", vals:[ v("Oui (Pack Hiver)","ok"), v("Oui","ok"), v("Oui","ok"), "n.d." ] },
+  { l:"Hayon", score:"bool", vals:[ v("Électrique + « Virtual Pedal » (mains libres)","ok"), v("Électrique — Easy Open & Close","ok"), v("Électrique — hauteur réglable","ok"), "Manuel" ] },
+  { l:"Sièges réglés électriquement", score:"bool", vals:[ "Non (réglage manuel)","Non — ArtVelours manuels", v("Oui — siège conducteur + lombaire Aircell","ok"), "Non (via finitions supérieures)" ] },
   { l:"Écrans", vals:[ "Multimédia 13\" + combiné 5\"","Discover Pro 12,9\" + combiné 5,3\"","2 × 12,3\" courbes + clim 5,1\"","2 × 12,3\" courbes" ] },
   { l:"Navigation intégrée", vals:[ v("Oui","ok"), v("Oui — Discover Pro","ok"), v("Oui","ok"), v("Oui","ok") ] },
   { l:"Recharge smartphone sans fil", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"Clé numérique (smartphone)", vals:[ "Non","Non", v("Oui — Digital Key 2.0","ok"), "Non (télécommande)" ] },
-  { l:"Démarrage sans clé", vals:[ v("Oui — KESSY Advanced","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"Feux de route intelligents", vals:[ v("LED Matrix (anti-éblouissement adaptatif)","ok"), v("LED Matrix + Dynamic Light Assist","ok"), "LED « Design Cubes »", "LED (classiques)" ] },
+  { l:"Clé numérique (smartphone)", score:"bool", vals:[ "Non","Non", v("Oui — Digital Key 2.0","ok"), "Non (télécommande)" ] },
+  { l:"Démarrage sans clé", score:"bool", vals:[ v("Oui — KESSY Advanced","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Feux de route intelligents", score:"bool", vals:[ v("LED Matrix (anti-éblouissement adaptatif)","ok"), v("LED Matrix + Dynamic Light Assist","ok"), "LED « Design Cubes »", "LED (classiques)" ] },
   { l:"Sellerie (devis)", vals:[ "LOFT — tissu","ArtVelours / microfibre","« Grey Two Tone » — vegan leather","Noir — tissu / vegan" ] }
 ]},
 { title:"Aides à la conduite", rows:[
-  { l:"Régulateur adaptatif (ACC) avec stop & go", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"Aide au maintien dans la voie", vals:[ v("Lane Assist","ok"), v("Lane Assist","ok"), v("LFA 2.0","ok"), v("LFA 2.0","ok") ] },
-  { l:"Assistant semi-autonome (niveau 2+)", vals:[ "Travel Assist : en option, non au devis", v("Travel Assist","ok"), v("HDA II — Pack Advanced Drive (niveau 2+)","ok"), v("HDA 1.0","ok") ] },
-  { l:"Freinage d'urgence (AEB)", vals:[ v("Oui","ok"), v("Oui + détection piétons / cyclistes à l'avant","ok"), v("Oui — FCA 2.0 (Pack Advanced Drive)","ok"), v("Oui — FCA 1.5","ok") ] },
-  { l:"Reconnaissance des panneaux", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — NSCC","ok"), v("Oui","ok") ] },
-  { l:"Détection de fatigue", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"Détection angle mort", vals:[ "Non (en option)", "Non (pas de Side Assist)", v("Oui — BCA + RVM","ok"), v("Oui — BCA","ok") ] },
-  { l:"Stationnement assisté", vals:[ "Non (en option)", v("Park Assist Plus","ok"), v("RSPA — à distance + télécommande (Pack Advanced Drive)","ok"), "Non (option)" ] },
-  { l:"Caméra 360°", vals:[ "Non (caméra AR)", "Non (caméra AR + Park Assist)", v("Oui — SVM 360° (Pack Advanced Drive)","ok"), "Non (caméra AR)" ] },
-  { l:"Capteurs de parking AV / AR", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — PDW AV/AR","ok"), v("Oui","ok") ] }
+  { l:"Régulateur adaptatif (ACC) avec stop & go", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Aide au maintien dans la voie", score:"bool", vals:[ v("Lane Assist","ok"), v("Lane Assist","ok"), v("LFA 2.0","ok"), v("LFA 2.0","ok") ] },
+  { l:"Assistant semi-autonome (niveau 2+)", score:"bool", vals:[ "Travel Assist : en option, non au devis", v("Travel Assist","ok"), v("HDA II — Pack Advanced Drive (niveau 2+)","ok"), v("HDA 1.0","ok") ] },
+  { l:"Freinage d'urgence (AEB)", score:"bool", vals:[ v("Oui","ok"), v("Oui + détection piétons / cyclistes à l'avant","ok"), v("Oui — FCA 2.0 (Pack Advanced Drive)","ok"), v("Oui — FCA 1.5","ok") ] },
+  { l:"Reconnaissance des panneaux", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — NSCC","ok"), v("Oui","ok") ] },
+  { l:"Détection de fatigue", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Détection angle mort", score:"bool", vals:[ "Non (en option)", "Non (pas de Side Assist)", v("Oui — BCA + RVM","ok"), v("Oui — BCA","ok") ] },
+  { l:"Stationnement assisté", score:"bool", vals:[ "Non (en option)", v("Park Assist Plus","ok"), v("RSPA — à distance + télécommande (Pack Advanced Drive)","ok"), "Non (option)" ] },
+  { l:"Caméra 360°", score:"bool", vals:[ "Non (caméra AR)", "Non (caméra AR + Park Assist)", v("Oui — SVM 360° (Pack Advanced Drive)","ok"), "Non (caméra AR)" ] },
+  { l:"Capteurs de parking AV / AR", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui — PDW AV/AR","ok"), v("Oui","ok") ] }
 ]},
 { title:"Sécurité & garanties", rows:[
   { l:"Euro NCAP (année, étoiles)", vals:[ v("★★★★★ 2025 — adultes 90 % · enfants 87 % · usagers fragiles 77 % · assist. 78 %",2025), v("★★★★★ 2021 — 93 % · 89 % · 76 % · 85 %",2021), v("★★★★★ 2024 — 83 % · 84 % · 78 % · 78 %",2024), v("★★★★★ 2022 — 89 % · 85 % · 64 % · 74 %",2022) ] },
-  { l:"Ancres ISOFIX", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"eCall (appel d'urgence)", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
-  { l:"Garantie véhicule", vals:[ v("2 ans, sans limite de km","monos"), v("2 ans, sans limite de km","monos"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] },
-  { l:"Garantie batterie (≥ 70 % capacité)", vals:[ v("8 ans ou 160 000 km","ok"), v("8 ans ou 160 000 km","ok"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] }
+  { l:"Ancres ISOFIX", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"eCall (appel d'urgence)", score:"bool", vals:[ v("Oui","ok"), v("Oui","ok"), v("Oui","ok"), v("Oui","ok") ] },
+  { l:"Garantie véhicule", score:"bool", vals:[ v("2 ans, sans limite de km","monos"), v("2 ans, sans limite de km","monos"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] },
+  { l:"Garantie batterie (≥ 70 % capacité)", score:"bool", vals:[ v("8 ans ou 160 000 km","ok"), v("8 ans ou 160 000 km","ok"), v("7 ans ou 150 000 km","ok"), v("7 ans ou 150 000 km","ok") ] }
 ]}
 ];
 
@@ -207,6 +229,130 @@ const FOOTNOTES = {
 
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+/* ===== Classement pondéré ===== */
+const WEIGHT_KEY = "comparatif-voitures-poids-v1";
+const DEFAULT_WEIGHT = 3;
+
+function boolText(val){ return typeof val === "string" ? val : String(val.t); }
+function isBoolGood(val){
+  const t = boolText(val);
+  return /^(Oui|\u2605)/.test(t) || (typeof val==="object" && val.n==="ok");
+}
+
+function rowScores(row){
+  if(row.best==="max" || row.best==="min"){
+    const nums = row.vals.map(val=> (typeof val==="object" && typeof val.n==="number") ? val.n : null);
+    const present = nums.filter(x=>x!==null);
+    if(present.length<2) return null;
+    const min = Math.min(...present), max = Math.max(...present);
+    return nums.map(x=>{
+      if(x===null) return 0.5;
+      if(max===min) return 0.5;
+      return row.best==="max" ? (x-min)/(max-min) : (max-x)/(max-min);
+    });
+  }
+  if(row.score==="bool"){
+    if(!row.vals.some(isBoolGood)) return null;
+    return row.vals.map(val=> isBoolGood(val) ? 1 : (/^n\.d\./i.test(boolText(val)) ? 0.5 : 0));
+  }
+  return null;
+}
+
+let WEIGHTS = {};
+try { WEIGHTS = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || {}; } catch(e){ WEIGHTS = {}; }
+const SCORED_SECTIONS = SECTIONS
+  .map((s,i)=>({ s, i }))
+  .filter(o=> o.i>0 && o.s.rows.some(r=>rowScores(r)));
+SCORED_SECTIONS.forEach(o=>{ if(!(o.i in WEIGHTS)) WEIGHTS[o.i] = DEFAULT_WEIGHT; });
+
+function saveWeights(){ try { localStorage.setItem(WEIGHT_KEY, JSON.stringify(WEIGHTS)); } catch(e){} }
+
+function computeRanking(){
+  const active = SCORED_SECTIONS.filter(o=>(WEIGHTS[o.i]||0) > 0);
+  const catScores = {};
+  active.forEach(o=>{
+    const rows = o.s.rows.map(rowScores).filter(Boolean);
+    const per = CARS.map((_,i)=>0);
+    rows.forEach(sc=>sc.forEach((s,i)=>per[i]+=s));
+    catScores[o.i] = per.map(sum=>sum/rows.length);
+  });
+  const wsum = active.reduce((a,o)=>a+WEIGHTS[o.i],0);
+  const total = CARS.map((_,i)=>
+    wsum ? active.reduce((a,o)=>a+WEIGHTS[o.i]*catScores[o.i][i],0)/wsum : 0
+  );
+  return { active, catScores, total };
+}
+
+function fmtPct(x){ return Math.round(100*x)+" %"; }
+
+function renderRanking(){
+  const { active, catScores, total } = computeRanking();
+  const medals = ["\ud83c\udfc1","\ud83e\udd47","\ud83e\udd48","\ud83e\udd49"];
+  const order = CARS.map((c,i)=>({ i, score: total[i] }))
+    .sort((a,b)=> b.score-a.score || (a.score===b.score ? a.i-b.i : 0));
+  const el = document.getElementById("ranking");
+  if(!el) return;
+  el.innerHTML = order.map((o,rank)=>{
+    const c = CARS[o.i];
+    const detail = SCORED_SECTIONS.map(s=>{
+      const w = WEIGHTS[s.i]||0;
+      const sc = catScores[s.i] !== undefined ? fmtPct(catScores[s.i][o.i]) : "—";
+      return s.title+" : "+sc+(w ? " (poids "+w+")" : " (ignorée)");
+    }).join("\n");
+    return `<div class="rankrow" title="${esc(detail)}">`
+      + `<span class="rankmedal">${medals[rank]||""}</span>`
+      + `<span class="rankname">${esc(c.name)}</span>`
+      + `<span class="rankbar"><span class="rankfill ${c.cls}" style="width:${Math.max(2,Math.round(100*o.score))}%"></span></span>`
+      + `<span class="rankscore">${fmtPct(o.score)}</span></div>`;
+  }).join("");
+  const ignored = SCORED_SECTIONS.filter(o=>!(WEIGHTS[o.i] > 0)).map(o=>o.s.title);
+  document.getElementById("rankign").innerHTML = ignored.length
+    ? "Catégories ignorées (poids 0) : <b>"+ignored.map(esc).join(", ")+"</b>."
+    : "";
+}
+
+function renderWeights(){
+  const el = document.getElementById("weights");
+  el.innerHTML = SCORED_SECTIONS.map(o=>{
+    const w = WEIGHTS[o.i]||0;
+    return `<label class="wrow">`
+      + `<span class="wtop"><span>${esc(o.s.title)}</span><span class="wval${w ? "" : " zero"}" id="wv-${o.i}">${w ? w : "ignorée"}</span></span>`
+      + `<input type="range" min="0" max="5" step="1" value="${w}" data-sec="${o.i}" aria-label="Poids : ${esc(o.s.title)}">`
+      + `</label>`;
+  }).join("");
+  el.querySelectorAll("input[type=range]").forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      WEIGHTS[inp.dataset.sec] = +inp.value;
+      const badge = document.getElementById("wv-"+inp.dataset.sec);
+      badge.textContent = +inp.value ? inp.value : "ignorée";
+      badge.classList.toggle("zero", !+inp.value);
+      saveWeights();
+      renderRanking();
+    });
+  });
+}
+
+function buildRankingPanel(){
+  const panel = document.createElement("div");
+  panel.className = "rankbox";
+  panel.innerHTML = `
+    <h2>Classement pondéré</h2>
+    <p class="rankhint">Attribuez un poids à chaque catégorie (0 = catégorie ignorée) : le classement ci-dessous combine ces poids avec les caractéristiques de chaque voiture (chaque critère est noté de 0 à 100 % au sein de sa catégorie, la meilleure valeur = 100 %). Retenez une catégorie pour masquer son influence. Le détail de chaque catégorie reste disponible dans les autres onglets.</p>
+    <div class="weights" id="weights"></div>
+    <div class="rankactions">
+      <button type="button" id="wreset">Réinitialiser les poids</button>
+    </div>
+    <div class="ranking" id="ranking"></div>
+    <p class="rankign" id="rankign"></p>`;
+  panel.querySelector("#wreset").addEventListener("click", ()=>{
+    SCORED_SECTIONS.forEach(o=>{ WEIGHTS[o.i] = DEFAULT_WEIGHT; });
+    saveWeights();
+    renderWeights();
+    renderRanking();
+  });
+  return panel;
+}
+
 function cellHtml(val, best){
   if(typeof val === "string") return "<td>"+esc(val)+"</td>";
   let cls = "val";
@@ -239,7 +385,17 @@ function render(){
       return "<tr><th class=\"rlab\">"+esc(row.l)+(row.unit?` <span class="muted">(${esc(row.unit)})</span>`:"")+"</th>"
         + row.vals.map(val=>cellHtml(val,best)).join("") + "</tr>";
     }).join("");
-    wrap.innerHTML = `<div class="tblwrap"><table><thead><tr><th>Critère</th>${CARS.map(c=>`<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    const tbl = document.createElement("div");
+    tbl.className = "tblwrap";
+    tbl.innerHTML = `<table><thead><tr><th>Critère</th>${CARS.map(c=>`<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+    if(si===0){
+      const detail = document.createElement("p");
+      detail.className = "detailtitle";
+      detail.textContent = "Détail des caractéristiques d'ensemble";
+      wrap.appendChild(buildRankingPanel());
+      wrap.appendChild(detail);
+    }
+    wrap.appendChild(tbl);
     secEl.appendChild(wrap);
   });
 
@@ -252,6 +408,9 @@ function render(){
       <h4 class="minus">À noter / limites</h4><ul>${c.minus.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
     </div>`).join("") + `</div>`;
   secEl.appendChild(sum);
+
+  renderWeights();
+  renderRanking();
 
   [...SECTIONS.map(s=>s.title),"Synthèse"].forEach((t,i)=>{
     const b=document.createElement("button");
