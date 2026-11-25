@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voiture de société vs voiture perso — Budget mobilité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFAF7; --card:#FFFFFF; --ink:#1A1D21; --steel:#5C6470; --line:#E4E6EA;
+    --accent:#C7392B; --accent-ink:#A82E22; --ok:#2E7D5B; --warn:#D99118; --warn-ink:#8A5A0F;
+    --night:#22303F; --volt:#E8C34A;
+    --brand-copro:#3d9a3d; --brand-perso:#124191; --brand-budget:#E8C34A;
+    --shadow-soft:-4px 8px 20px -8px rgba(26,29,33,.16), 0 1px 3px rgba(26,29,33,.05);
+    --shadow-hover:-6px 12px 26px -8px rgba(26,29,33,.22), 0 2px 5px rgba(26,29,33,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;font:400 16px/1.55 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink);background:var(--paper);font-feature-settings:"tnum" 1;
+  }
+  h1,h2,h3,h4{font-family:"Archivo","Inter",sans-serif}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+  ::selection{background:rgba(199,57,43,.18)}
+
+  header{background-color:var(--night);color:#fff;padding:30px 20px 26px;position:relative;overflow:hidden}
+  header::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='420' viewBox='0 0 1400 420'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1.5'%3E%3Cpath d='M-80 390 C 360 310, 900 440, 1480 250'/%3E%3Cpath d='M-80 340 C 420 260, 960 390, 1480 200'/%3E%3Cpath d='M-80 290 C 480 210, 1020 340, 1480 150'/%3E%3Cpath d='M-80 240 C 540 160, 1080 290, 1480 100'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:cover;background-position:center bottom;
+  }
+  .headrow{max-width:1200px;margin:0 auto;position:relative;display:flex;flex-wrap:wrap;gap:18px 32px;align-items:flex-end;justify-content:space-between}
+  .kicker{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#c9d1da;display:flex;align-items:center;gap:8px}
+  .kicker::before{content:"";width:26px;height:4px;border-radius:2px;background:var(--volt)}
+  header h1{margin:0 0 8px;font-size:clamp(24px,3.2vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.01em}
+  header p{margin:0;color:#c9d1da;font-size:14px;max-width:820px}
+  header p b{color:#fff;font-weight:600}
+  .backlink{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.28);color:#fff;text-decoration:none;
+    font:600 13.5px "Inter",sans-serif;border-radius:8px;padding:10px 16px;white-space:nowrap;
+    transition:border-color .15s ease-out,background-color .15s ease-out;
+  }
+  .backlink:hover{border-color:var(--volt);background:rgba(232,195,74,.12)}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:0 16px 44px}
+
+  .seahead{margin:24px 0 4px}
+  .seahead h2{margin:0 0 6px;font-size:clamp(20px,2.4vw,28px);line-height:1.25;font-weight:700}
+  .tach{display:flex;align-items:center;gap:6px;margin:0 0 16px}
+  .tach .dot{width:5px;height:5px;border-radius:50%;background:var(--steel)}
+  .tach .line{flex:1;height:1px;background:var(--line)}
+  .tach .chev{width:7px;height:7px;border-top:2px solid var(--steel);border-right:2px solid var(--steel);transform:rotate(45deg)}
+
+  .verdict{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ok);
+    border-radius:10px;padding:16px 20px;font-size:15px;box-shadow:var(--shadow-soft);margin:0 0 14px;
+  }
+  .verdict b{font-weight:700}
+  .verdict .gain{font:700 16px "JetBrains Mono",monospace;color:var(--ok)}
+  .verdict.even{border-left-color:var(--warn)}
+  .verdict.even .gain{color:var(--warn-ink)}
+
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:14px;margin:0 0 18px}
+  .sumcard{
+    background:var(--card);border:1px solid var(--line);border-radius:22px 22px 12px 12px;
+    padding:14px 16px 16px;font-size:13.5px;box-shadow:var(--shadow-soft);position:relative;
+    transition:transform .18s ease-out, box-shadow .18s ease-out;
+  }
+  .sumcard:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+  .sumcard .colorline{display:block;width:34px;height:4px;border-radius:2px;margin-bottom:10px}
+  .sumcard.cop .colorline{background:var(--brand-copro)}
+  .sumcard.pers .colorline{background:var(--brand-perso)}
+  .sumcard.bud .colorline{background:var(--brand-budget)}
+  .sumcard h3{margin:0 0 2px;font-size:15px}
+  .sumcard .mode{font-size:12px;color:var(--steel);margin:0 0 10px}
+  .sumcard .total{font:700 26px/1.2 "JetBrains Mono",monospace;font-feature-settings:"tnum" 1;margin:2px 0 2px}
+  .sumcard .total.win{color:var(--ok)}
+  .sumcard .winmark{position:absolute;top:14px;right:14px;background:var(--ok);color:#fff;border-radius:999px;font:700 11px/1 "Inter",sans-serif;padding:6px 10px}
+  .sumcard .meta{color:var(--steel);font-size:12.5px;margin:0 0 8px}
+  .sumcard .cash{color:var(--ok);font-weight:700}
+  .sumcard ul{margin:0;padding:0;list-style:none;border-top:1px dashed var(--line);padding-top:8px}
+  .sumcard li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:12.5px}
+  .sumcard li span:last-child{font-family:"JetBrains Mono",monospace;font-weight:600;white-space:nowrap}
+
+  .chartbox{
+    background:var(--card);border:1px solid var(--line);border-radius:16px 16px 10px 10px;
+    padding:16px 18px 12px;margin:0 0 18px;box-shadow:var(--shadow-soft);
+  }
+  .chartbox h3{margin:0 0 2px;font-size:16px}
+  .chartbox .chsub{margin:0 0 10px;color:var(--steel);font-size:13px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 8px;font-size:13px}
+  .legend .item{display:inline-flex;align-items:center;gap:7px}
+  .legend .swatch{width:18px;height:4px;border-radius:2px}
+  .chartwrap{overflow-x:auto}
+  .chartwrap svg{min-width:640px;width:100%;height:auto;display:block}
+
+  .tblwrap{
+    overflow-x:auto;background:var(--card);border:1px solid var(--line);
+    border-radius:14px 14px 10px 10px;margin:0 0 6px;box-shadow:var(--shadow-soft);
+  }
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+  th,td{padding:10px 14px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:top}
+  thead th{position:sticky;top:0;background:var(--card);font:600 13px "Inter",sans-serif;border-bottom:1px solid var(--line);z-index:5}
+  tbody th,.rlab{background:var(--paper);font-weight:600;position:sticky;left:0;min-width:180px;font-size:13.5px;z-index:2}
+  tr:last-child td, tr:last-child th{border-bottom:none}
+  td{font-feature-settings:"tnum" 1}
+  td.num{font-family:"JetBrains Mono",monospace;font-weight:600;white-space:nowrap}
+  .neg{color:var(--ok)}
+  .emplo{color:var(--steel);font-style:italic;font-weight:400;font-size:12.5px;white-space:nowrap}
+  .bestline{background:rgba(46,125,91,.07);font-weight:700;color:var(--ok)}
+  tfoot td,tfoot th{border-top:1px solid var(--line);border-bottom:none;font-weight:700}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:16px 16px 10px 10px;
+    padding:16px 18px 18px;box-shadow:var(--shadow-soft);
+  }
+  .panel > h3{margin:0 0 2px;font-size:16px;display:flex;align-items:center;gap:8px}
+  .panel > .psub{margin:0 0 12px;color:var(--steel);font-size:13px}
+  .panel.pcop > h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--brand-copro)}
+  .panel.ppers > h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--brand-perso)}
+  .panel.pbud > h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--brand-budget)}
+  .panel.pcommon > h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+
+  .field{display:flex;flex-direction:column;gap:5px;margin:0 0 12px}
+  .field label{font-size:13px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .field .unit{color:var(--steel);font-weight:400;font-size:12px}
+  .field input[type=number]{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+    font:600 15px "JetBrains Mono",monospace;color:var(--ink);background:var(--paper);
+    transition:border-color .15s ease-out, box-shadow .15s ease-out;
+  }
+  .field input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(199,57,43,.14);outline:none}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .switchline{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:2px 0 12px}
+  .switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .switch input{position:absolute;opacity:0;width:1px;height:1px}
+  .switch .track{width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;flex:0 0 auto;transition:background-color .18s ease-out}
+  .switch .knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(26,29,33,.3);transition:left .18s ease-out,background-color .18s ease-out,box-shadow .18s ease-out}
+  .switch input:checked + .track{background:rgba(46,125,91,.25)}
+  .switch input:checked + .track .knob{left:21px;background:var(--ok);box-shadow:0 0 7px rgba(46,125,91,.75)}
+  .switch input:focus-visible + .track{outline:2px solid var(--accent);outline-offset:2px}
+  .switch .switchlabel{font-size:13.5px;color:var(--ink);font-weight:500}
+  .bigswitch input:checked + .track{background:rgba(18,65,145,.22)}
+  .bigswitch input:checked + .track .knob{background:var(--brand-perso);box-shadow:0 0 7px rgba(18,65,145,.6)}
+
+  .finetabs{display:flex;gap:8px;margin:0 0 14px}
+  .finetabs button{
+    flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;
+    border-radius:999px;cursor:pointer;font:600 13.5px "Inter",sans-serif;
+    transition:border-color .15s ease-out,color .15s ease-out,background-color .15s ease-out;
+  }
+  .finetabs button:hover{border-color:var(--accent-ink);color:var(--accent-ink)}
+  .finetabs button.active{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .actions button{
+    border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 16px;
+    font:600 13px "Inter",sans-serif;cursor:pointer;color:var(--ink);
+    transition:border-color .15s ease-out,color .15s ease-out,transform .12s ease-out;
+  }
+  .actions button:hover{border-color:var(--accent-ink);color:var(--accent-ink)}
+  .actions button:active{transform:translateY(1px)}
+
+  .notebox{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:10px;padding:12px 16px;font-size:13.5px;color:var(--steel);margin:16px 0;box-shadow:var(--shadow-soft);
+  }
+  .notebox b{color:var(--ink)}
+
+  footer{background-color:var(--night);color:#c9d1da;font-size:13px;line-height:1.7;margin-top:28px;padding:26px 20px 32px;position:relative;overflow:hidden}
+  footer::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='260' viewBox='0 0 1400 260'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1.5'%3E%3Cpath d='M-80 240 C 400 180, 950 260, 1480 130'/%3E%3Cpath d='M-80 190 C 460 130, 1010 210, 1480 80'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:cover;background-position:center;
+  }
+  .footwrap{max-width:1200px;margin:0 auto;position:relative}
+  footer .fsep{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+  footer .fsep .dot{width:5px;height:5px;border-radius:50%;background:var(--volt)}
+  footer .fsep .line{flex:1;height:1px;background:rgba(255,255,255,.18)}
+  footer .fsep .chev{width:7px;height:7px;border-top:2px solid rgba(255,255,255,.4);border-right:2px solid rgba(255,255,255,.4);transform:rotate(45deg)}
+  footer b{color:var(--volt);font-weight:600}
+  footer .tagline{margin:16px 0 0;font:600 14px "Archivo",sans-serif;color:#fff;display:flex;align-items:center;gap:8px}
+  footer .tagline::before{content:"";width:22px;height:3px;border-radius:2px;background:var(--volt)}
+
+  .hidden{display:none}
+  @media (max-width:640px){
+    .row2{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .rise{animation:rise 240ms ease-out both;animation-delay:var(--d,0ms)}
+    @keyframes rise{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="headrow">
+    <div>
+      <p class="kicker">Comparateur · mobilité</p>
+      <h1>Voiture de société ou voiture personnelle&nbsp;?</h1>
+      <p>Comparez le <b>coût net total</b> de chaque option sur une même durée&nbsp;: voiture de société (ATN + éventuels frais de remise, tout le reste est pris en charge par l'employeur, carburant inclus), voiture personnelle via <b>leasing tout inclus</b> ou <b>achat avec prêt</b> (apport, mensualités, taxes, assurance, entretien, pneus, réparations, carburant), et l'alternative <b>budget mobilité</b> reçu en net.</p>
+    </div>
+    <a class="backlink" href="../">← Retour aux outils finances</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="seahead rise">
+    <h2>Résultat</h2>
+    <div class="tach"><span class="dot"></span><span class="line"></span><span class="chev"></span></div>
+  </div>
+
+  <div class="verdict rise" id="verdict"></div>
+  <div class="results" id="results"></div>
+
+  <div class="chartbox rise">
+    <h3>Coût cumulé mois par mois</h3>
+    <p class="chsub" id="chartsub"></p>
+    <div class="legend" id="chartlegend"></div>
+    <div class="chartwrap"><svg id="chart" viewBox="0 0 900 330" role="img" aria-label="Coût cumulé des scénarios"></svg></div>
+  </div>
+
+  <div class="tblwrap rise">
+    <table aria-label="Détail des coûts">
+      <thead>
+        <tr>
+          <th>Poste de coût</th>
+          <th>Voiture de société</th>
+          <th id="thperso">Voiture personnelle</th>
+        </tr>
+      </thead>
+      <tbody id="detailbody"></tbody>
+      <tfoot id="detailfoot"></tfoot>
+    </table>
+  </div>
+  <p class="hint">★ Poste le plus avantageux pour une ligne chiffrée · «&nbsp;Pris en charge&nbsp;» = couvert par l'employeur ou inclus dans le loyer.</p>
+
+  <div class="seahead rise">
+    <h2>Paramètres</h2>
+    <div class="tach"><span class="dot"></span><span class="line"></span><span class="chev"></span></div>
+  </div>
+
+  <div class="actions">
+    <button type="button" id="resetbtn">Réinitialiser les valeurs par défaut</button>
+  </div>
+
+  <div class="grid">
+    <section class="panel pcommon rise">
+      <h3>Commun</h3>
+      <p class="psub">Durée d'analyse et usage de la voiture, identique pour les deux scénarios.</p>
+      <div class="row2">
+        <div class="field">
+          <label for="annees">Durée d'analyse <span class="unit">années</span></label>
+          <input type="number" id="annees" min="1" max="20" step="1" value="5">
+        </div>
+        <div class="field">
+          <label for="kman">Kilomètres parcourus <span class="unit">km/an</span></label>
+          <input type="number" id="kman" min="0" step="500" value="15000">
+        </div>
+      </div>
+      <div class="switchline">
+        <label class="switch">
+          <input type="checkbox" id="elec" checked>
+          <span class="track"><span class="knob"></span></span>
+          <span class="switchlabel" id="eleclabel">Voiture électrique</span>
+        </label>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="conso">Consommation <span class="unit" id="consounit">kWh / 100 km</span></label>
+          <input type="number" id="conso" min="0" step="0.1" value="17">
+        </div>
+        <div class="field">
+          <label for="prixcarb">Prix de l'énergie <span class="unit" id="prixunit">€ / kWh</span></label>
+          <input type="number" id="prixcarb" min="0" step="0.01" value="0.35">
+        </div>
+      </div>
+    </section>
+
+    <section class="panel pcop rise">
+      <h3>Voiture de société</h3>
+      <p class="psub">Carburant, assurance, taxes, entretien et pneus sont pris en charge par l'employeur.</p>
+      <div class="row2">
+        <div class="field">
+          <label for="atn">Avantage « ATN » <span class="unit">€/mois</span></label>
+          <input type="number" id="atn" min="0" step="10" value="350">
+        </div>
+        <div class="field">
+          <label for="taux">Taux marginal d'imposition <span class="unit">%</span></label>
+          <input type="number" id="taux" min="0" max="100" step="0.5" value="50">
+        </div>
+      </div>
+      <div class="field">
+        <label for="remise">Frais de remise estimés (dégâts, manquants…) <span class="unit">€ (une fois, en fin de contrat)</span></label>
+        <input type="number" id="remise" min="0" step="25" value="0">
+      </div>
+    </section>
+
+    <section class="panel pbud rise">
+      <h3>Budget mobilité</h3>
+      <p class="psub">Montant reçu en net si vous renoncez à la voiture de société.</p>
+      <div class="field">
+        <label for="budget">Budget mobilité net <span class="unit">€/mois</span></label>
+        <input type="number" id="budget" min="0" step="25" value="500">
+      </div>
+      <div class="switchline">
+        <label class="switch bigswitch">
+          <input type="checkbox" id="budgetapply" checked>
+          <span class="track"><span class="knob"></span></span>
+          <span class="switchlabel">Utiliser le budget mobilité pour financer la voiture perso</span>
+        </label>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel ppers rise" style="margin-top:14px">
+    <h3>Voiture personnelle</h3>
+    <p class="psub" id="perssub">Choisissez le mode de financement&nbsp;: leasing tout inclus ou achat avec prêt auto.</p>
+    <div class="finetabs" role="tablist" aria-label="Mode de financement">
+      <button type="button" id="tab-leasing" class="active" role="tab" aria-selected="true">Leasing (tout inclus)</button>
+      <button type="button" id="tab-achat" role="tab" aria-selected="false">Achat avec prêt</button>
+    </div>
+
+    <div id="leasingbox">
+      <div class="row2">
+        <div class="field">
+          <label for="leasmens">Loyer mensuel <span class="unit">€/mois</span></label>
+          <input type="number" id="leasmens" min="0" step="5" value="450">
+        </div>
+        <div class="field">
+          <label for="leasdur">Durée du leasing <span class="unit">mois</span></label>
+          <input type="number" id="leasdur" min="1" step="1" value="48">
+        </div>
+      </div>
+      <div class="switchline">
+        <label class="switch">
+          <input type="checkbox" id="leaspneus">
+          <span class="track"><span class="knob"></span></span>
+          <span class="switchlabel">Pneus inclus dans le loyer</span>
+        </label>
+      </div>
+      <p class="hint">Le leasing couvre l'assurance, les taxes et l'entretien&nbsp;: seuls le carburant (et éventuellement les pneus) restent à votre charge.</p>
+    </div>
+
+    <div id="achatbox" class="hidden">
+      <p class="hint">Le prix de la voiture est financé par un apport (certificat d'immatriculation, mise en circulation…) et des mensualités de prêt.</p>
+      <div class="row2">
+        <div class="field">
+          <label for="apport">Apport <span class="unit">€ (une fois, au départ)</span></label>
+          <input type="number" id="apport" min="0" step="100" value="5000">
+        </div>
+        <div class="field">
+          <label for="pretmens">Mensualité du prêt <span class="unit">€/mois</span></label>
+          <input type="number" id="pretmens" min="0" step="5" value="450">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="pretdur">Durée du prêt <span class="unit">mois</span></label>
+          <input type="number" id="pretdur" min="1" step="1" value="48">
+        </div>
+        <div class="field">
+          <label for="tmc">Taxe de mise en circulation <span class="unit">€ (une fois)</span></label>
+          <input type="number" id="tmc" min="0" step="5" value="75">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="taxecirc">Taxe de circulation <span class="unit">€/an</span></label>
+          <input type="number" id="taxecirc" min="0" step="10" value="200">
+        </div>
+        <div class="field">
+          <label for="assurance">Assurance <span class="unit">€/an</span></label>
+          <input type="number" id="assurance" min="0" step="25" value="700">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="entretien">Entretien (révisions) <span class="unit">€/an</span></label>
+          <input type="number" id="entretien" min="0" step="25" value="300">
+        </div>
+        <div class="field">
+          <label for="pneus">Pneus (remplacement) <span class="unit">€/an</span></label>
+          <input type="number" id="pneus" min="0" step="25" value="200">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reparations">Réparations imprévues <span class="unit">€/an</span></label>
+        <input type="number" id="reparations" min="0" step="25" value="150">
+      </div>
+    </div>
+  </section>
+
+  <div class="notebox rise">
+    <b>Hypothèses&nbsp;:</b> le scénario «&nbsp;budget mobilité seul&nbsp;» suppose que vous n'avez plus de voiture du tout (le montant net reste dans votre poche). Pour la voiture perso, après la fin du leasing ou du prêt, la mensualité s'arrête mais les coûts d'usage continuent. La valeur de revente éventuelle de la voiture achetée n'est pas déduite.
+  </div>
+</div>
+
+<footer>
+  <div class="footwrap">
+    <div class="fsep"><span class="dot"></span><span class="line"></span><span class="chev"></span></div>
+    <b>Comparateur mobilité</b> — voiture de société, budget mobilité et voiture personnelle (leasing ou achat). Estimation indicative&nbsp;: encodez vos montants réels (devis leasing, simulation de prêt, ATN de votre fiche de salaire) pour affiner le résultat.
+    <p class="tagline">Outil finances · Romain Croix</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const NAMES = {
+    annees:"Durée d'analyse (années)", kman:"Km/an", conso:"Consommation", prixcarb:"Prix de l'énergie",
+    atn:"ATN (€/mois)", taux:"Taux marginal (%)", remise:"Frais de remise (€)",
+    budget:"Budget mobilité net (€/mois)", leasmens:"Loyer leasing (€/mois)", leasdur:"Durée leasing (mois)",
+    apport:"Apport (€)", pretmens:"Mensualité prêt (€/mois)", pretdur:"Durée prêt (mois)",
+    tmc:"Mise en circulation (€)", taxecirc:"Taxe de circulation (€/an)", assurance:"Assurance (€/an)",
+    entretien:"Entretien (€/an)", pneus:"Pneus (€/an)", reparations:"Réparations (€/an)"
+  };
+  const DEFAULTS = () => ({
+    annees:5, kman:15000,
+    elec:{conso:17, prixcarb:0.35, tmc:75, taxecirc:200, assurance:700, entretien:300, pneus:200, reparations:150},
+    essence:{conso:7, prixcarb:1.75, tmc:150, taxecirc:400, assurance:700, entretien:450, pneus:150, reparations:250},
+    atn:350, taux:50, remise:0,
+    budget:500, budgetapply:true,
+    mode:"leasing",
+    leasmens:450, leasdur:48, leaspneus:false,
+    apport:5000, pretmens:450, pretdur:48,
+    check:{elec:true}
+  });
+  let D = DEFAULTS();
+
+  const fmt = (n) => new Intl.NumberFormat("fr-BE",{maximumFractionDigits:0}).format(Math.round(n)) + " €";
+  const fmtc = (n) => new Intl.NumberFormat("fr-BE",{maximumFractionDigits:2}).format(n);
+
+  function applyDefaultsToInputs(){
+    $("elec").checked = D.check.elec;
+    $("annees").value = D.annees;
+    $("kman").value = D.kman;
+    $("atn").value = D.atn; $("taux").value = D.taux; $("remise").value = D.remise;
+    $("budget").value = D.budget; $("budgetapply").checked = D.budgetapply;
+    $("leasmens").value = D.leasmens; $("leasdur").value = D.leasdur; $("leaspneus").checked = D.leaspneus;
+    $("apport").value = D.apport; $("pretmens").value = D.pretmens; $("pretdur").value = D.pretdur;
+    const kit = D.check.elec ? D.elec : D.essence;
+    $("conso").value = kit.conso; $("prixcarb").value = kit.prixcarb;
+    $("tmc").value = kit.tmc; $("taxecirc").value = kit.taxecirc; $("assurance").value = kit.assurance;
+    $("entretien").value = kit.entretien; $("pneus").value = kit.pneus; $("reparations").value = kit.reparations;
+    setMode(D.mode);
+  }
+
+  function readState(){
+    return {
+      annees: Math.max(1, +$("annees").value || 1),
+      kman: Math.max(0, +$("kman").value || 0),
+      elec: $("elec").checked,
+      conso: Math.max(0, +$("conso").value || 0),
+      prixcarb: Math.max(0, +$("prixcarb").value || 0),
+      atn: Math.max(0, +$("atn").value || 0),
+      taux: Math.min(100, Math.max(0, +$("taux").value || 0)),
+      remise: Math.max(0, +$("remise").value || 0),
+      budget: Math.max(0, +$("budget").value || 0),
+      budgetapply: $("budgetapply").checked,
+      mode: D.mode,
+      leasmens: Math.max(0, +$("leasmens").value || 0),
+      leasdur: Math.max(1, +$("leasdur").value || 1),
+      leaspneus: $("leaspneus").checked,
+      apport: Math.max(0, +$("apport").value || 0),
+      pretmens: Math.max(0, +$("pretmens").value || 0),
+      pretdur: Math.max(1, +$("pretdur").value || 1),
+      tmc: Math.max(0, +$("tmc").value || 0),
+      taxecirc: Math.max(0, +$("taxecirc").value || 0),
+      assurance: Math.max(0, +$("assurance").value || 0),
+      entretien: Math.max(0, +$("entretien").value || 0),
+      pneus: Math.max(0, +$("pneus").value || 0),
+      reparations: Math.max(0, +$("reparations").value || 0)
+    };
+  }
+
+  function compute(s){
+    const H = s.annees * 12;
+    const kmTotal = s.kman * s.annees;
+    const fuelMo = s.kman / 12 / 100 * s.conso * s.prixcarb;
+    const fuel = fuelMo * H;
+
+    const societe = {
+      atnMo: s.atn * s.taux / 100,
+      total: s.atn * s.taux / 100 * H + s.remise,
+      fuelAlso: fuel,
+      parts: { atn: s.atn * s.taux / 100 * H, remise: s.remise }
+    };
+
+    const fin = s.mode === "leasing"
+      ? { label:"Leasing", mens:s.leasmens, duree:Math.min(s.leasdur,H), total:s.leasmens * Math.min(s.leasdur,H), oneShot:0, start:0,
+          inclAssurance:true, inclTaxes:true, inclEntretien:true, inclPneus:s.leaspneus, inclRep:true }
+      : { label:"Achat avec prêt", mens:s.pretmens, duree:Math.min(s.pretdur,H), total:s.apport + s.pretmens * Math.min(s.pretdur,H), oneShot:s.tmc, start:s.apport + s.tmc,
+          inclAssurance:false, inclTaxes:false, inclEntretien:false, inclPneus:false, inclRep:false };
+
+    const persoParts = {
+      financement: fin.total,
+      tmc: fin.oneShot,
+      taxes: fin.inclTaxes ? 0 : s.taxecirc * s.annees,
+      assurance: fin.inclAssurance ? 0 : s.assurance * s.annees,
+      entretien: fin.inclEntretien ? 0 : s.entretien * s.annees,
+      pneus: fin.inclPneus ? 0 : s.pneus * s.annees,
+      reparations: fin.inclRep ? 0 : s.reparations * s.annees,
+      carburant: fuel
+    };
+    const persoBrut = Object.values(persoParts).reduce((a,b)=>a+b,0);
+    const budgetTotal = s.budget * H;
+    const budgetUsed = s.budgetapply ? budgetTotal : 0;
+    const persoNet = persoBrut - budgetUsed;
+
+    const fixPerMo = (fin.inclAssurance && fin.inclTaxes && fin.inclEntretien && fin.inclRep)
+      ? (fin.inclPneus ? 0 : s.pneus) / 12
+      : (s.assurance + s.taxecirc + s.entretien + s.pneus + s.reparations) / 12;
+
+    const monthly = { societe:[], perso:[] };
+    for (let m=1; m<=H; m++){
+      monthly.societe.push(m * societe.atnMo + (m === H ? s.remise : 0));
+      monthly.perso.push(
+        Math.min(m, fin.duree) * fin.mens
+        + m * fixPerMo
+        + m * fuelMo
+        + fin.start
+        - m * budgetUsed / H
+      );
+    }
+
+    return { H, kmTotal, societe, fin, persoParts, persoBrut, persoNet, budgetTotal, budgetUsed, monthly, fuelMo };
+  }
+
+  function render(){
+    const s = readState();
+    const r = compute(s);
+    const c = (n) => new Intl.NumberFormat("fr-BE",{maximumFractionDigits:0}).format(n);
+
+    localStorage.setItem("svsp", JSON.stringify({
+      v: Object.fromEntries(Object.keys(NAMES).map(k=>[k, $(k) ? $(k).value : ""])),
+      elec: $("elec").checked, budgetapply: $("budgetapply").checked,
+      leaspneus: $("leaspneus").checked, mode: D.mode
+    }));
+
+    $("eleclabel").textContent = s.elec ? "Voiture électrique" : "Voiture essence";
+    $("consounit").textContent = s.elec ? "kWh / 100 km" : "L / 100 km";
+    $("prixunit").textContent = s.elec ? "€ / kWh" : "€ / L";
+    $("perssub").textContent = s.mode === "leasing"
+      ? "Le leasing couvre l'assurance, les taxes et l'entretien."
+      : "Achat financé par apport + prêt : vous payez en plus taxes, assurance, entretien, pneus et réparations.";
+    $("thperso").textContent = "Voiture personnelle (" + (s.mode === "leasing" ? "leasing" : "achat avec prêt") + (s.budgetapply && s.budget > 0 ? ", budget mobilité déduit" : "") + ")";
+
+    const diff = r.persoNet - r.societe.total;
+    const v = $("verdict");
+    if (Math.abs(diff) < 1){
+      v.className = "verdict even";
+      v.innerHTML = "⚔️ <b>Match nul</b> — les deux scénarios coûtent environ le même montant net sur " + s.annees + " an(s) (" + fmt(r.societe.total) + ").";
+    } else if (diff > 0){
+      v.className = "verdict";
+      v.innerHTML = "🏆 <b>La voiture de société est plus économique.</b> Elle coûte " + (r.societe.total >= 0 ? "seulement " : "") + "<b>" + fmt(r.societe.total) + "</b> nets sur " + s.annees + " an(s) contre <b>" + fmt(r.persoNet) + "</b> pour la voiture perso, soit une économie de <span class='gain'>" + fmt(diff) + "</span>";
+      if (r.persoNet < 0) v.innerHTML += " — dans ce cas, le budget mobilité couvre tous les coûts de la voiture perso et vous rapporte même " + fmt(-r.persoNet) + " nets en plus.";
+      v.innerHTML += ".";
+    } else {
+      v.className = "verdict";
+      v.innerHTML = "🏆 <b>Votre voiture personnelle est plus économique.</b> Elle coûte <b>" + fmt(r.persoNet) + "</b> nets sur " + s.annees + " an(s) contre <b>" + fmt(r.societe.total) + "</b> pour la voiture de société, soit une économie de <span class='gain'>" + fmt(-diff) + "</span>";
+      if (s.budgetapply && s.budget > 0) v.innerHTML += " (budget mobilité de " + fmt(r.budgetTotal) + " déjà déduit)";
+      if (r.persoNet < 0) v.innerHTML += " — le budget mobilité couvre tous les coûts et vous rapporte même " + fmt(-r.persoNet) + " nets en plus, sans voiture de société.";
+      v.innerHTML += ".";
+    }
+
+    const kmLabel = r.kmTotal > 0 ? c(r.kmTotal) + " km sur " + s.annees + " an(s) · " : "";
+    const modeLabel = s.mode === "leasing" ? "leasing " + s.leasdur + " mois" : "achat (apport " + fmt(s.apport) + " + prêt " + s.pretdur + " mois)";
+    const cards = [
+      {
+        cls:"cop", name:"Voiture de société", sub:"Tout pris en charge par l'employeur (carburant, assurance, entretien, taxes)",
+        total:r.societe.total, sub2:r.societe.total / s.annees / 12, km:r.societe.total / Math.max(1, r.kmTotal),
+        lines:[["ATN net (" + s.taux + "% de " + fmt(s.atn) + "/mois)", r.societe.parts.atn],
+               ["Frais de remise", r.societe.parts.remise]]
+      },
+      {
+        cls:"pers", name:"Voiture personnelle", sub:modeLabel + (s.budgetapply && s.budget > 0 ? " · budget mobilité −" + fmt(r.budgetTotal) : ""),
+        total:r.persoNet, sub2:r.persoNet / s.annees / 12, km:r.persoNet / Math.max(1, r.kmTotal),
+        lines:[["Financement (" + r.fin.label + ")", r.persoParts.financement],
+               ["Taxe de mise en circulation", r.persoParts.tmc],
+               ["Taxes de circulation", r.persoParts.taxes],
+               ["Assurance", r.persoParts.assurance],
+               ["Entretien", r.persoParts.entretien],
+               ["Pneus", r.persoParts.pneus],
+               ["Réparations", r.persoParts.reparations],
+               ["Carburant / énergie", r.persoParts.carburant]]
+      },
+      {
+        cls:"bud", name:"Budget mobilité seul", sub:"Sans voiture : le montant net reste dans votre poche",
+        total:-r.budgetTotal, sub2:-s.budget, km:null,
+        cash:r.budgetTotal,
+        lines:[["Reçu en net chaque mois", s.budget, true],["Reçu en net sur " + s.annees + " an(s)", r.budgetTotal, false]]
+      }
+    ];
+
+    const best = Math.min(r.societe.total, r.persoNet);
+    $("results").innerHTML = cards.map((cd, i) => {
+      const isWin = cd.cls !== "bud" && cd.total === best;
+      return "<article class='sumcard " + cd.cls + " rise' style='--d:" + (i*70) + "ms'>"
+        + (isWin ? "<span class='winmark'>✓ Le moins cher</span>" : "")
+        + "<span class='colorline'></span>"
+        + "<h3>" + cd.name + "</h3>"
+        + "<p class='mode'>" + cd.sub + "</p>"
+        + (cd.cls === "bud"
+            ? "<p class='meta'>Sur " + s.annees + " an(s)&nbsp;:</p>"
+            : "<p class='total" + (isWin ? " win" : "") + "'>" + fmt(cd.total) + "</p><p class='meta'>" + kmLabel + "≈ " + new Intl.NumberFormat("fr-BE",{maximumFractionDigits:0}).format(cd.sub2) + " €/mois" + (cd.km !== null ? " · " + new Intl.NumberFormat("fr-BE",{maximumFractionDigits:2}).format(cd.km) + " €/km" : "") + "</p>")
+        + "<ul>"
+        + cd.lines.map(l =>
+            "<li><span>" + l[0] + "</span><span" + (l[1] < 0 || l[2] ? " class='cash'" : "") + ">" + (l[2] ? "+" + fmt(l[1]) + "/mois" : (l[1] === 0 ? "—" : fmt(l[1]))) + "</span></li>"
+          ).join("")
+        + "</ul></article>";
+    }).join("");
+
+    renderChart(r, s);
+    renderDetail(r, s);
+  }
+
+  function renderChart(r, s){
+    const pts = [
+      { label:"Voiture de société", color:"#3d9a3d", data:r.monthly.societe },
+      { label:"Voiture perso" + (s.budgetapply && s.budget > 0 ? " (budget mobilité déduit)" : ""), color:"#124191", data:r.monthly.perso }
+    ];
+    const maxv = Math.max(1, ...pts[0].data, ...pts[1].data, 0);
+    const minv = Math.min(0, ...pts[1].data, ...pts[0].data);
+    const W=900, Hh=330, L=78, R=100, T=16, B=44;
+    const iw=W-L-R, ih=Hh-T-B;
+    const x = m => L + iw * (m / Math.max(1, r.H - 1 || 1));
+    const y = v => T + ih * (1 - (v - minv) / (maxv - minv || 1));
+    let out = "";
+
+    const steps = 5;
+    for (let i=0;i<=steps;i++){
+      const val = minv + (maxv-minv) * i / steps;
+      out += "<line x1='"+L+"' x2='"+(W-R)+"' y1='"+y(val)+"' y2='"+y(val)+"' stroke='#E4E6EA' stroke-width='1' stroke-dasharray='" + (i===0 ? "0" : "3 4") + "'/>";
+      out += "<text x='"+(L-8)+"' y='"+(y(val)+4)+"' text-anchor='end' font-size='11' fill='#5C6470' font-family='JetBrains Mono,monospace'>"+ fmtShort(val) +"</text>";
+    }
+    const yq = s.annees <= 6 ? 1 : Math.ceil(s.annees/6);
+    for (let yr=1; yr<=s.annees; yr++){
+      if (yr % yq !== 0 && yr !== s.annees) continue;
+      const m = Math.min(r.H, yr*12) - 1;
+      out += "<line x1='"+x(m)+"' x2='"+x(m)+"' y1='"+T+"' y2='"+(T+ih)+"' stroke='#E4E6EA' stroke-width='1' stroke-dasharray='3 4'/>";
+      out += "<text x='"+x(m)+"' y='"+(Hh-20)+"' text-anchor='middle' font-size='11' fill='#5C6470'>"+yr+" an"+(yr>1?"s":"")+"</text>";
+    }
+    pts.forEach(function(p){
+      const d = p.data.map((v,i)=> (i===0?"M":"L") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+      out += "<path d='"+d+"' fill='none' stroke='"+p.color+"' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>";
+      const lv = p.data[p.data.length-1];
+      out += "<circle cx='"+x(r.H-1)+"' cy='"+y(lv)+"' r='4' fill='"+p.color+"'/>";
+      out += "<text x='"+(x(r.H-1)+6)+"' y='"+(y(lv)+4)+"' font-size='11' font-weight='700' fill='"+p.color+"' font-family='JetBrains Mono,monospace'>"+fmt(lv)+"</text>";
+    });
+    out += "<line x1='"+L+"' x2='"+(W-R)+"' y1='"+y(0)+"' y2='"+y(0)+"' stroke='#5C6470' stroke-width='1'/>";
+    $("chart").innerHTML = out;
+    $("chartlegend").innerHTML = pts.map(p => "<span class='item'><span class='swatch' style='background:"+p.color+"'></span>"+p.label+"</span>").join("");
+    $("chartsub").innerHTML = (r.kmTotal > 0 ? new Intl.NumberFormat("fr-BE",{maximumFractionDigits:0}).format(r.kmTotal) + " km en " + s.annees + " an(s) · " : "") + (s.elec ? "électrique" : "essence") + " · " + s.kman.toLocaleString("fr-BE") + " km/an" + (r.fin.duree < r.H ? " · " + r.fin.label.toLowerCase() + " payé pendant " + r.fin.duree + " mois seulement" : "");
+  }
+
+  function fmtShort(v){
+    const n = Math.round(v);
+    return (n < 0 ? "-" : "") + new Intl.NumberFormat("fr-BE",{maximumFractionDigits:0,notation:Math.abs(n)>=10000?"compact":"standard"}).format(n) + (Math.abs(n)>=10000 ? "" : " €");
+  }
+
+  function renderDetail(r, s){
+    const prisCharged = "<span class='emplo'>Pris en charge</span>";
+    const zero = r.mode === "leasing" ? "<span class='emplo'>Inclus dans le loyer</span>" : "—";
+    const rows = [
+      {label:"Financement (loyers / apport + prêt)", cop:null, pers:r.persoParts.financement},
+      {label:"Taxe de mise en circulation", cop:null, pers:r.persoParts.tmc},
+      {label:"Taxe de circulation", cop:prisCharged, pers:r.persoParts.taxes},
+      {label:"Assurance", cop:prisCharged, pers:r.persoParts.assurance},
+      {label:"Entretien", cop:prisCharged, pers:r.persoParts.entretien},
+      {label:"Pneus", cop:prisCharged, pers:r.persoParts.pneus},
+      {label:"Réparations imprévues", cop:prisCharged, pers:r.persoParts.reparations},
+      {label:"Carburant / énergie", cop:prisCharged, pers:r.persoParts.carburant},
+      {label:"ATN (impôt)", cop:r.societe.parts.atn, pers:null},
+      {label:"Frais de remise (dégâts, manquants…)", cop:r.societe.parts.remise, pers:null},
+      {label:"Budget mobilité (déduit)", cop:null, pers:-r.budgetUsed}
+    ];
+    $("detailbody").innerHTML = rows.map(function(row){
+      const copCell = typeof row.cop === "number" ? (row.cop === 0 ? "—" : fmt(row.cop)) : (row.cop === null ? "—" : row.cop);
+      let persCell;
+      if (row.pers === null) persCell = "—";
+      else if (row.pers === 0) persCell = zero;
+      else if (row.pers < 0) persCell = "<span class='neg'>−" + fmt(Math.abs(row.pers)) + "</span>";
+      else persCell = fmt(row.pers);
+      return "<tr><th>" + row.label + "</th><td class='num'>" + copCell + "</td><td class='num'>" + persCell + "</td></tr>";
+    }).join("");
+
+    $("detailfoot").innerHTML =
+      "<tr><th>Total net sur " + s.annees + " an(s)</th>"
+      + "<td class='num'>" + fmt(r.societe.total) + "</td>"
+      + "<td class='num" + (r.persoNet < 0 ? " neg" : "") + "'>" + (r.persoNet < 0 ? "−" : "") + fmt(Math.abs(r.persoNet)) + (r.budgetapply ? "" : " <span class='emplo'>(budget mobilité non déduit)</span>") + "</td></tr>";
+  }
+
+  function setMode(mode){
+    D.mode = mode;
+    $("tab-leasing").classList.toggle("active", mode === "leasing");
+    $("tab-achat").classList.toggle("active", mode === "achat");
+    $("tab-leasing").setAttribute("aria-selected", mode === "leasing");
+    $("tab-achat").setAttribute("aria-selected", mode === "achat");
+    $("leasingbox").className = mode === "leasing" ? "" : "hidden";
+    $("achatbox").className = mode === "achat" ? "" : "hidden";
+    render();
+  }
+
+  function onElecChange(){
+    const nowElec = $("elec").checked;
+    if (nowElec !== D.check.elec){
+      const kit = nowElec ? D.elec : D.essence;
+      $("conso").value = kit.conso; $("prixcarb").value = kit.prixcarb;
+      $("tmc").value = kit.tmc; $("taxecirc").value = kit.taxecirc; $("assurance").value = kit.assurance;
+      $("entretien").value = kit.entretien; $("pneus").value = kit.pneus; $("reparations").value = kit.reparations;
+      D.check.elec = nowElec;
+    }
+    render();
+  }
+
+  document.querySelectorAll("input[type=number]").forEach(inp => {
+    inp.addEventListener("input", render);
+    inp.addEventListener("change", render);
+  });
+  $("elec").addEventListener("change", onElecChange);
+  $("budgetapply").addEventListener("change", render);
+  $("leaspneus").addEventListener("change", render);
+  $("tab-leasing").addEventListener("click", () => setMode("leasing"));
+  $("tab-achat").addEventListener("click", () => setMode("achat"));
+  $("resetbtn").addEventListener("click", () => {
+    localStorage.removeItem("svsp");
+    D = DEFAULTS();
+    applyDefaultsToInputs();
+    render();
+  });
+
+  try {
+    const saved = JSON.parse(localStorage.getItem("svsp") || "null");
+    if (saved && saved.v){
+      Object.entries(saved.v).forEach(([k,v]) => { if ($(k) && NAMES[k]) $(k).value = v; });
+      if (typeof saved.elec === "boolean") $("elec").checked = saved.elec;
+      if (typeof saved.budgetapply === "boolean") $("budgetapply").checked = saved.budgetapply;
+      if (typeof saved.leaspneus === "boolean") $("leaspneus").checked = saved.leaspneus;
+      if (saved.mode === "achat" || saved.mode === "leasing") D.mode = saved.mode;
+    }
+  } catch(e){}
+
+  setMode(D.mode);
+})();
+</script>
+</body>
+</html>
